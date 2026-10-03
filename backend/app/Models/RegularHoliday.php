@@ -11,6 +11,19 @@ use Illuminate\Database\Eloquent\Model;
 final class RegularHoliday extends Model
 {
     /**
+     * @return list<int>
+     */
+    public static function days(): array
+    {
+        return self::query()
+            ->orderBy('day_of_week')
+            ->pluck('day_of_week')
+            ->map(fn (mixed $day): int => (int) $day)
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
