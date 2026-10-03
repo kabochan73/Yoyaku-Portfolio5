@@ -64,7 +64,7 @@ docker compose exec backend php artisan migrate --seed
 
 ## CI（GitHub Actions）
 
-実装の最初（土台を作る段階）で用意し、`push`（main）と `pull_request` で実行する。
+画面まで作り終えた後、本番デプロイの前に用意する。`push`（main）と `pull_request` で実行する。
 
 | ジョブ | ステップ |
 |---|---|
@@ -186,14 +186,15 @@ E2E テストを入れない代わりに、デプロイのたびに次を手で�
 
 ## 実装の順番
 
-[00](00-overview.md#実装の順番) の各段階で作るもの。各段階は、テストが CI で通ったら完了。
+[00](00-overview.md#実装の順番) の各段階で作るもの。各段階は、テスト・静的解析・整形のチェックが手元で通ったら完了。
 
 | 段階 | 作るもの |
 |---|---|
-| 1. 土台 | Laravel・Next.js のプロジェクト、docker compose、Dockerfile（開発用）、整形・静的解析・テストの設定、CI（この時点ではテストが少ないので、空でも通る形） |
+| 1. 土台 | Laravel・Next.js のプロジェクト、docker compose、Dockerfile（開発用）、整形・静的解析・テストの設定 |
 | 2. DB | マイグレーション、制約、モデルの最小限、Factory、シーダー |
 | 3. 業務ロジック | `config/facility.php`、Enum、モデルのメソッド、`Reservations/`・`Calendar/`・`Facility/`、イベント・リスナー、メール |
 | 4. API | ルート、FormRequest、Policy、Resource、Controller、エラー形式、回数制限、TrustProxies |
-| 5. フロントの土台 | `lib/`、各機能の `logic/`、共通 UI 部品、レイアウト、Cache Components の設定、再検証の受け口、スタブサーバー |
+| 5. フロントの土台 | `lib/`、各機能の `logic/`、共通 UI 部品、レイアウト、Cache Components の設定、再検証の受け口 |
 | 6. 画面 | トップ → ログイン・会員登録 → マイページ → 管理画面 |
-| 7. 本番デプロイ | Dockerfile の本番ステージ、Railway のサービス、初回デプロイ、手動確認 |
+| 7. CI | `.github/workflows/ci.yml`、ビルド用のスタブサーバー、`◐` の確認 |
+| 8. 本番デプロイ | Dockerfile の本番ステージ、Railway のサービス、初回デプロイ、手動確認 |
