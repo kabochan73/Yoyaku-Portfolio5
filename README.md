@@ -40,6 +40,9 @@ docker compose exec backend php artisan migrate --seed
 | frontend のテスト | `docker compose exec frontend npm test` |
 | frontend の型チェック | `docker compose exec frontend npm run typecheck` |
 | frontend の lint・整形 | `docker compose exec frontend npm run lint` / `npm run format` |
+| キューの worker を再起動する | `docker compose restart worker` |
+
+worker は起動したときのコードと設定を使い続けるので、backend のコードや設定を変えたら再起動する。
 
 ## 設計書
 
