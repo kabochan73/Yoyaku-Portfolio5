@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Domain\Reservations\BookingRules;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -26,6 +27,8 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
+
+        TrustProxies::at(array_map('trim', explode(',', (string) config('app.trusted_proxies'))));
     }
 
     private function configureRateLimiting(): void
