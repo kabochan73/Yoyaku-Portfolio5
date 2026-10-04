@@ -263,7 +263,7 @@ DB::transaction:
 ```
 
 - 行ロックで、会員と管理者が同時にキャンセルしてもメールが2通にならない
-- 認可は Action の外（Controller で `$this->authorize('cancel', $reservation)`）
+- 認可は Action の外（Controller で `Gate::authorize('cancel', $reservation)`）
 
 ## 臨時休業日の登録: `CloseDay`
 
@@ -398,7 +398,7 @@ final class ReservationController extends Controller
 
     public function cancel(Reservation $reservation, CancelReservation $action): ReservationResource
     {
-        $this->authorize('cancel', $reservation);
+        Gate::authorize('cancel', $reservation);
 
         return ReservationResource::make($action->handle($reservation, CancellationReason::ByMember));
     }
