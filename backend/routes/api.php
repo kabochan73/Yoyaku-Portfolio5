@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FacilityController;
 use Illuminate\Http\Request;
@@ -12,6 +13,11 @@ Route::get('/facility', FacilityController::class);
 
 Route::middleware('throttle:login')->group(function () {
     Route::post('/register', RegisterController::class);
+    Route::post('/login', [SessionController::class, 'store']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [SessionController::class, 'destroy']);
 });
 
 Route::get('/calendar', CalendarController::class)
