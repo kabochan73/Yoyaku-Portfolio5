@@ -48,6 +48,8 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin'])->group(functio
     Route::get('/holidays', [Admin\HolidayController::class, 'index']);
     Route::post('/holidays', [Admin\HolidayController::class, 'store']);
     Route::delete('/holidays/{holiday}', [Admin\HolidayController::class, 'destroy']);
+
+    Route::get('/users', [Admin\UserController::class, 'index']);
 });
 
 // デプロイ後に、Laravel から見た IP が利用者の IP になっているかを確かめるための口
