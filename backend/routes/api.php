@@ -38,6 +38,9 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin'])->group(functio
     Route::get('/calendar', Admin\CalendarController::class)
         ->withoutMiddleware('throttle:api')
         ->middleware(['throttle:calendar', 'cache.headers:private;no_cache;etag']);
+
+    Route::post('/reservations', [Admin\ReservationController::class, 'store']);
+    Route::post('/reservations/{reservation}/cancel', [Admin\ReservationController::class, 'cancel']);
 });
 
 // デプロイ後に、Laravel から見た IP が利用者の IP になっているかを確かめるための口
