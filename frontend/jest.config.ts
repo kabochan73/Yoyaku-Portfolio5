@@ -2,6 +2,8 @@ import type { Config } from "jest";
 import nextJest from "next/jest.js";
 
 process.env.API_URL ??= "http://api.test/api";
+process.env.FRONTEND_URL ??= "http://frontend.test";
+process.env.REVALIDATE_SECRET ??= "test-secret";
 
 // 日付の計算が端末のタイムゾーンに引きずられていないかを、すべてのテストで確かめるため
 process.env.TZ = "America/Los_Angeles";
