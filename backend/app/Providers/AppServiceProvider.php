@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Domain\Reservations\BookingRules;
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -27,6 +30,8 @@ final class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureRateLimiting();
+
+        Gate::define('admin', fn (User $user): bool => $user->role === UserRole::Admin);
 
         TrustProxies::at(array_map('trim', explode(',', (string) config('app.trusted_proxies'))));
     }
