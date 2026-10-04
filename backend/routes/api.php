@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FacilityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/facility', FacilityController::class);
+
+Route::middleware('throttle:login')->group(function () {
+    Route::post('/register', RegisterController::class);
+});
 
 Route::get('/calendar', CalendarController::class)
     ->withoutMiddleware('throttle:api')
