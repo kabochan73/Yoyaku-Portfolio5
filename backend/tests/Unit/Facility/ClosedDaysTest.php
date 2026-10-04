@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Facility\ClosedDays;
-use App\Reservations\DayClosedReason;
+use App\Domain\Facility\ClosedDays;
+use App\Domain\Reservations\DayClosedReason;
 use Carbon\CarbonImmutable;
 
 it('B6: 定休日・臨時休業日の判定', function (string $date, bool $isHoliday, ?DayClosedReason $reason) {

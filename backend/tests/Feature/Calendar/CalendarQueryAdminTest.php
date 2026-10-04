@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Calendar\AdminCalendarDay;
-use App\Calendar\CalendarQuery;
+use App\Domain\Calendar\AdminCalendarDay;
+use App\Domain\Calendar\CalendarQuery;
+use App\Domain\Reservations\DayClosedReason;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\RegularHoliday;
 use App\Models\Reservation;
-use App\Reservations\DayClosedReason;
-use App\Reservations\ReservationStatus;
 use Carbon\CarbonImmutable;
 
 beforeEach(function () {

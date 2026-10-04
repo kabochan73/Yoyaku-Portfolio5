@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Calendar\CalendarCache;
-use App\Exceptions\ConflictException;
-use App\Facility\PriceType;
+use App\Domain\Calendar\CalendarCache;
+use App\Domain\ConflictException;
+use App\Domain\Facility\PriceType;
+use App\Domain\Reservations\CreateReservation;
+use App\Domain\Reservations\Events\ReservationCreated;
+use App\Domain\Reservations\TimeSlot;
 use App\Models\Holiday;
 use App\Models\Price;
 use App\Models\RegularHoliday;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\CreateReservation;
-use App\Reservations\Events\ReservationCreated;
-use App\Reservations\TimeSlot;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Calendar\DayFacts;
+use App\Domain\Calendar\DayFacts;
 
 function dayFacts(): DayFacts
 {

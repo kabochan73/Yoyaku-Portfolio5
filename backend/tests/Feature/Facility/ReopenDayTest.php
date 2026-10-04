@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Facility\Events\HolidayChanged;
-use App\Facility\ReopenDay;
+use App\Domain\Facility\Events\HolidayChanged;
+use App\Domain\Facility\ReopenDay;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Holiday;
 use App\Models\Reservation;
-use App\Reservations\ReservationStatus;
 use Illuminate\Support\Facades\Event;
 
 it('臨時休業日を削除し、キャンセルした予約は戻さない', function () {

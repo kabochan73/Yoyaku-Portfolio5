@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
+use App\Domain\Reservations\CancellationReason;
 use App\Models\Reservation;
-use App\Reservations\CancellationReason;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;

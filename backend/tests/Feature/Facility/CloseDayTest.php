@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\ConflictException;
-use App\Facility\CloseDay;
-use App\Facility\Events\HolidayChanged;
+use App\Domain\ConflictException;
+use App\Domain\Facility\CloseDay;
+use App\Domain\Facility\Events\HolidayChanged;
+use App\Domain\Reservations\CancellationReason;
+use App\Domain\Reservations\Events\ReservationCancelled;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Holiday;
 use App\Models\Reservation;
-use App\Reservations\CancellationReason;
-use App\Reservations\Events\ReservationCancelled;
-use App\Reservations\ReservationStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;

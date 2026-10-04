@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Domain\Reservations\CancellationReason;
 use App\Mail\ReservationCancelledMail;
 use App\Mail\ReservationConfirmedMail;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\CancellationReason;
 
 function mailReservation(): Reservation
 {

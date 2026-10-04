@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Reservations\ReservationPhase;
-use App\Reservations\ReservationStatus;
-use App\Reservations\TimeSlot;
+use App\Domain\Reservations\ReservationPhase;
+use App\Domain\Reservations\ReservationStatus;
+use App\Domain\Reservations\TimeSlot;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Database\Factories\ReservationFactory;

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Facility\Events\FacilityChanged;
-use App\Facility\Listeners\RevalidateFrontendCache;
-use App\Facility\PriceType;
-use App\Facility\UpdatePrices;
-use App\Facility\UpdateRegularHolidays;
+use App\Domain\Facility\Events\FacilityChanged;
+use App\Domain\Facility\Listeners\RevalidateFrontendCache;
+use App\Domain\Facility\PriceType;
+use App\Domain\Facility\UpdatePrices;
+use App\Domain\Facility\UpdateRegularHolidays;
+use App\Domain\Reservations\CreateReservation;
+use App\Domain\Reservations\TimeSlot;
 use App\Models\Price;
 use App\Models\User;
-use App\Reservations\CreateReservation;
-use App\Reservations\TimeSlot;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Facility\PriceTable;
-use App\Facility\PriceType;
+use App\Domain\Facility\PriceTable;
+use App\Domain\Facility\PriceType;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use RuntimeException;

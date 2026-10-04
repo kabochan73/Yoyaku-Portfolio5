@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Domain\Facility\PriceType;
 use App\Enums\UserRole;
-use App\Facility\PriceType;
 use App\Models\Price;
 use App\Models\RegularHoliday;
 use App\Models\User;

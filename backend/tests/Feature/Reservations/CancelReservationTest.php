@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Exceptions\ConflictException;
+use App\Domain\ConflictException;
+use App\Domain\Reservations\CancellationReason;
+use App\Domain\Reservations\CancelReservation;
+use App\Domain\Reservations\Events\ReservationCancelled;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Reservation;
-use App\Reservations\CancellationReason;
-use App\Reservations\CancelReservation;
-use App\Reservations\Events\ReservationCancelled;
-use App\Reservations\ReservationStatus;
 use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {

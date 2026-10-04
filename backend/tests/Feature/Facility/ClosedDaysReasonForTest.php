@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Facility\ClosedDays;
+use App\Domain\Facility\ClosedDays;
+use App\Domain\Reservations\DayClosedReason;
 use App\Models\Holiday;
 use App\Models\RegularHoliday;
-use App\Reservations\DayClosedReason;
 use Carbon\CarbonImmutable;
 
 beforeEach(function () {

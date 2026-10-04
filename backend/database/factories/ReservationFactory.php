@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\ReservationStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

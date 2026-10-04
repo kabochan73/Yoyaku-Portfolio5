@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Reservations\BookingRules;
-use App\Reservations\DayClosedReason;
-use App\Reservations\TimeSlot;
+use App\Domain\Reservations\BookingRules;
+use App\Domain\Reservations\DayClosedReason;
+use App\Domain\Reservations\TimeSlot;
 use Carbon\CarbonImmutable;
 use Illuminate\Validation\ValidationException;
 

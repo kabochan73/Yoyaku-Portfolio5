@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-use App\Facility\CloseDay;
-use App\Facility\PriceType;
+use App\Domain\Facility\CloseDay;
+use App\Domain\Facility\PriceType;
+use App\Domain\Reservations\CancellationReason;
+use App\Domain\Reservations\CancelReservation;
+use App\Domain\Reservations\CreateReservation;
+use App\Domain\Reservations\Events\ReservationCancelled;
+use App\Domain\Reservations\Events\ReservationCreated;
+use App\Domain\Reservations\Listeners\SendReservationCancelledMail;
+use App\Domain\Reservations\Listeners\SendReservationConfirmedMail;
+use App\Domain\Reservations\TimeSlot;
 use App\Mail\ReservationCancelledMail;
 use App\Mail\ReservationConfirmedMail;
 use App\Models\Price;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\CancellationReason;
-use App\Reservations\CancelReservation;
-use App\Reservations\CreateReservation;
-use App\Reservations\Events\ReservationCancelled;
-use App\Reservations\Events\ReservationCreated;
-use App\Reservations\Listeners\SendReservationCancelledMail;
-use App\Reservations\Listeners\SendReservationConfirmedMail;
-use App\Reservations\TimeSlot;
 use Carbon\CarbonImmutable;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Support\Facades\Event;

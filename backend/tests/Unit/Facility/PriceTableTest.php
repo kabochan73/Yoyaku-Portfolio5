@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Facility\PriceTable;
-use App\Facility\PriceType;
-use App\Reservations\TimeSlot;
+use App\Domain\Facility\PriceTable;
+use App\Domain\Facility\PriceType;
+use App\Domain\Reservations\TimeSlot;
 
 it('B9: 料金はその日の単価 × 時間数', function (string $date, int $start, int $end, int $price) {
     $table = new PriceTable(weekday: 4000, weekend: 5000);

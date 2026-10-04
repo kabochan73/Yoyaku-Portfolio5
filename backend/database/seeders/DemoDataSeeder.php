@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Facility\PriceType;
+use App\Domain\Facility\PriceType;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Price;
 use App\Models\RegularHoliday;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\ReservationStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

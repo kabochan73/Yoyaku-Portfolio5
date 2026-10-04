@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Facility\PriceType;
+use App\Domain\Facility\PriceType;
 use App\Models\Price;
 
 it('DB の料金から料金表を作る', function () {

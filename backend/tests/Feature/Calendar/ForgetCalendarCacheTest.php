@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-use App\Calendar\CalendarCache;
-use App\Calendar\Listeners\ForgetCalendarCache;
-use App\Facility\CloseDay;
-use App\Facility\Events\FacilityChanged;
-use App\Facility\Events\HolidayChanged;
-use App\Facility\PriceType;
-use App\Facility\ReopenDay;
-use App\Facility\UpdateRegularHolidays;
+use App\Domain\Calendar\CalendarCache;
+use App\Domain\Calendar\Listeners\ForgetCalendarCache;
+use App\Domain\Facility\CloseDay;
+use App\Domain\Facility\Events\FacilityChanged;
+use App\Domain\Facility\Events\HolidayChanged;
+use App\Domain\Facility\PriceType;
+use App\Domain\Facility\ReopenDay;
+use App\Domain\Facility\UpdateRegularHolidays;
+use App\Domain\Reservations\CancellationReason;
+use App\Domain\Reservations\CancelReservation;
+use App\Domain\Reservations\CreateReservation;
+use App\Domain\Reservations\Events\ReservationCancelled;
+use App\Domain\Reservations\Events\ReservationCreated;
+use App\Domain\Reservations\TimeSlot;
 use App\Models\Holiday;
 use App\Models\Price;
 use App\Models\Reservation;
-use App\Reservations\CancellationReason;
-use App\Reservations\CancelReservation;
-use App\Reservations\CreateReservation;
-use App\Reservations\Events\ReservationCancelled;
-use App\Reservations\Events\ReservationCreated;
-use App\Reservations\TimeSlot;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;

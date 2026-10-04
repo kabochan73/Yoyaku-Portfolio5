@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Facility\Events\FacilityChanged;
-use App\Facility\PriceType;
-use App\Facility\UpdatePrices;
-use App\Facility\UpdateRegularHolidays;
+use App\Domain\Facility\Events\FacilityChanged;
+use App\Domain\Facility\PriceType;
+use App\Domain\Facility\UpdatePrices;
+use App\Domain\Facility\UpdateRegularHolidays;
 use App\Models\Price;
 use App\Models\RegularHoliday;
 use App\Models\Reservation;

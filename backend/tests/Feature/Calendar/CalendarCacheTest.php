@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Calendar\CalendarCache;
+use App\Domain\Calendar\CalendarCache;
 use App\Models\Holiday;
 use App\Models\RegularHoliday;
 use App\Models\Reservation;

@@ -3,8 +3,8 @@
 ## 方針
 
 1. Controller は「受け取って、Action に渡して、Resource で返す」だけにする
-2. 業務ロジックは機能ごとのフォルダ（`Reservations/`・`Calendar/`・`Facility/`）に置く。ルール・処理・Enum・イベントを同じフォルダにまとめ、「その機能のコードはどこか」が1か所で済むようにする
-3. Laravel が場所を決めているもの（`Http`・`Models`・`Policies`・`Mail`・`Providers`）は標準の場所に置く
+2. 業務ロジックは `Domain/` の下の機能ごとのフォルダ（`Reservations/`・`Calendar/`・`Facility/`）に置く。ルール・処理・Enum・イベントを同じフォルダにまとめ、「その機能のコードはどこか」が1か所で済むようにする
+3. Laravel が場所を決めているもの（`Http`・`Models`・`Policies`・`Mail`・`Providers`）は標準の場所に置く。`app/` の直下を見れば、「`Domain/` が業務ロジック、それ以外は Laravel の決まったフォルダ」と分かるようにする
 4. 守らなければいけないルールは、DB 制約 → Action → FormRequest の順に強い場所で守る。画面の制限は使いやすさのためで、守りには数えない
 5. 抽象化は「2か所以上で使う」か「テストで差し替える」ときだけ。Repository 層やインターフェースは作らず、Eloquent をそのまま使う
 
@@ -28,52 +28,55 @@ backend/app/
 │   │   ├── CalendarRequest.php
 │   │   ├── StoreReservationRequest.php
 │   │   └── UpdateProfileRequest.php
-│   └── Resources/
-│       ├── Admin/       CalendarDayResource, ReservationResource, UserResource
-│       ├── CalendarDayResource.php
-│       ├── FacilityResource.php
-│       ├── HolidayResource.php
-│       ├── ReservationResource.php
-│       └── UserResource.php
+│   ├── Resources/
+│   │   ├── Admin/       CalendarDayResource, ReservationResource, UserResource
+│   │   ├── CalendarDayResource.php
+│   │   ├── FacilityResource.php
+│   │   ├── HolidayResource.php
+│   │   ├── ReservationResource.php
+│   │   └── UserResource.php
+│   └── ApiExceptionRenderer.php      例外を API のエラー形式の JSON にする
 ├── Models/              User, Reservation, Price, RegularHoliday, Holiday
 ├── Policies/            ReservationPolicy
 ├── Mail/                ReservationConfirmedMail, ReservationCancelledMail
 ├── Providers/           AppServiceProvider
-├── Exceptions/          ConflictException, ApiExceptionRenderer
 ├── Enums/               UserRole
 │
-├── Reservations/                    予約
-│   ├── CreateReservation.php        予約する（会員・電話）
-│   ├── CancelReservation.php        キャンセルする
-│   ├── BookingRules.php             DB を見ずに決まるルール（営業時間・長さ・期間・過ぎた時刻）
-│   ├── TimeSlot.php                 日付 + 開始の時 + 終了の時
-│   ├── ReservationStatus.php        confirmed / cancelled
-│   ├── ReservationPhase.php         before_start / in_use / finished
-│   ├── CancellationReason.php       by_member / by_admin / by_holiday
-│   ├── DayClosedReason.php          past / out_of_range / regular_holiday / holiday
-│   ├── Events/                      ReservationCreated, ReservationCancelled
-│   └── Listeners/                   SendReservationConfirmedMail, SendReservationCancelledMail
-│
-├── Calendar/                        カレンダー
-│   ├── CalendarQuery.php            公開用・管理者用のカレンダーを組み立てる
-│   ├── CalendarCache.php            日ごとの事実を Redis 経由で読む・消す
-│   ├── DayFacts.php                 1日分の事実（予約・臨時休業日か）
-│   ├── CalendarDay.php              公開用の1日分
-│   ├── AdminCalendarDay.php         管理者用の1日分
-│   ├── CalendarSlot.php             1枠
-│   ├── SlotStatus.php               available / booked / past / closed
-│   └── Listeners/                   ForgetCalendarCache
-│
-└── Facility/                        施設の設定
-    ├── UpdatePrices.php
-    ├── UpdateRegularHolidays.php
-    ├── CloseDay.php                 臨時休業日の登録（予約の一括キャンセルを含む）
-    ├── ReopenDay.php                臨時休業日の削除
-    ├── ClosedDays.php               定休日・臨時休業日の判定
-    ├── PriceTable.php               平日・土日の単価と料金の計算
-    ├── PriceType.php                weekday / weekend
-    ├── Events/                      FacilityChanged, HolidayChanged
-    └── Listeners/                   RevalidateFrontendCache
+└── Domain/                              業務ロジック
+    ├── ConflictException.php            今のデータの状態とぶつかった（409）
+    │
+    ├── Reservations/                    予約
+    │   ├── CreateReservation.php        予約する（会員・電話）
+    │   ├── CancelReservation.php        キャンセルする
+    │   ├── BookingRules.php             DB を見ずに決まるルール（営業時間・長さ・期間・過ぎた時刻）
+    │   ├── TimeSlot.php                 日付 + 開始の時 + 終了の時
+    │   ├── ReservationStatus.php        confirmed / cancelled
+    │   ├── ReservationPhase.php         before_start / in_use / finished
+    │   ├── CancellationReason.php       by_member / by_admin / by_holiday
+    │   ├── DayClosedReason.php          past / out_of_range / regular_holiday / holiday
+    │   ├── Events/                      ReservationCreated, ReservationCancelled
+    │   └── Listeners/                   SendReservationConfirmedMail, SendReservationCancelledMail
+    │
+    ├── Calendar/                        カレンダー
+    │   ├── CalendarQuery.php            公開用・管理者用のカレンダーを組み立てる
+    │   ├── CalendarCache.php            日ごとの事実を Redis 経由で読む・消す
+    │   ├── DayFacts.php                 1日分の事実（予約・臨時休業日か）
+    │   ├── CalendarDay.php              公開用の1日分
+    │   ├── AdminCalendarDay.php         管理者用の1日分
+    │   ├── CalendarSlot.php             1枠
+    │   ├── SlotStatus.php               available / booked / past / closed
+    │   └── Listeners/                   ForgetCalendarCache
+    │
+    └── Facility/                        施設の設定
+        ├── UpdatePrices.php
+        ├── UpdateRegularHolidays.php
+        ├── CloseDay.php                 臨時休業日の登録（予約の一括キャンセルを含む）
+        ├── ReopenDay.php                臨時休業日の削除
+        ├── ClosedDays.php               定休日・臨時休業日の判定
+        ├── PriceTable.php               平日・土日の単価と料金の計算
+        ├── PriceType.php                weekday / weekend
+        ├── Events/                      FacilityChanged, HolidayChanged
+        └── Listeners/                   RevalidateFrontendCache
 ```
 
 ```
@@ -93,8 +96,9 @@ backend/
 | 入力の形式チェック（型・必須・形式） | `Http/Requests`（FormRequest） |
 | 認可 | `Policies`、`Gate`、ルートの `can:` |
 | レスポンスの形 | `Http/Resources` |
-| 業務ルール・更新処理・参照の組み立て | 機能フォルダ |
+| 業務ルール・更新処理・参照の組み立て | `Domain/` の機能フォルダ |
 | 機能に属する Enum・イベント・リスナー | その機能フォルダ |
+| 業務ロジックが投げる例外 | `Domain/`（`ConflictException`） |
 | 機能に属さない Enum | `Enums/`（`UserRole` だけ） |
 | 予約ルールの値・施設情報 | `config/facility.php` |
 
@@ -103,10 +107,10 @@ backend/
 
 ### リスナーの自動登録
 
-Laravel は標準では `app/Listeners` だけを探すので、`bootstrap/app.php` で機能フォルダの `Listeners/` を探すように指定する。
+Laravel は標準では `app/Listeners` だけを探すので、`bootstrap/app.php` で機能フォルダの `Listeners/` を探すように指定する。`bootstrap/app.php` はアプリの準備が整う前に読まれるので、`app_path()` ではなく `__DIR__` からの相対パスで書く。
 
 ```php
-->withEvents(discover: [app_path('*/Listeners')])
+->withEvents(discover: [__DIR__.'/../app/Domain/*/Listeners'])
 ```
 
 ## 設定: `config/facility.php`
@@ -153,7 +157,7 @@ return [
 判定は「DB を見ずに決まるもの」と「DB を見るもの」で置き場所を分ける。
 
 ```php
-// Reservations/TimeSlot.php
+// Domain/Reservations/TimeSlot.php
 final readonly class TimeSlot
 {
     public function __construct(
@@ -168,7 +172,7 @@ final readonly class TimeSlot
     public function isWeekend(): bool;
 }
 
-// Reservations/BookingRules.php — DB に触らない。config の値と「今」だけで判定する
+// Domain/Reservations/BookingRules.php — DB に触らない。config の値と「今」だけで判定する
 final readonly class BookingRules
 {
     // 営業時間・長さ・期間・過ぎた時刻を検査する。違反はまとめて ValidationException（422）
@@ -178,7 +182,7 @@ final readonly class BookingRules
     public function isPastSlot(CarbonImmutable $date, int $hour, CarbonImmutable $now): bool;
 }
 
-// Facility/ClosedDays.php — 定休日・臨時休業日の判定
+// Domain/Facility/ClosedDays.php — 定休日・臨時休業日の判定
 final class ClosedDays
 {
     // ルールだけ（DB に触らない）。カレンダーはキャッシュから読んだ値を渡す
@@ -403,7 +407,7 @@ final class ReservationController extends Controller
 
 ## 例外とエラーレスポンス
 
-`bootstrap/app.php` の `withExceptions` で、`api/*` のエラーを [03 のエラー形式](03-api.md#エラー形式) にそろえる（`ApiExceptionRenderer`）。
+`bootstrap/app.php` の `withExceptions` で、`api/*` のエラーを [03 のエラー形式](03-api.md#エラー形式) にそろえる（`Http/ApiExceptionRenderer`）。
 
 | 例外 | ステータス / `code` |
 |---|---|

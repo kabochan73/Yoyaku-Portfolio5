@@ -192,7 +192,7 @@ E2E テストを入れない代わりに、デプロイのたびに次を手で�
 |---|---|
 | 1. 土台 | Laravel・Next.js のプロジェクト、docker compose、Dockerfile（開発用）、整形・静的解析・テストの設定 |
 | 2. DB | マイグレーション、制約、モデルの最小限、Factory、シーダー |
-| 3. 業務ロジック | `config/facility.php`、Enum、モデルのメソッド、`Reservations/`・`Calendar/`・`Facility/`、イベント・リスナー、メール |
+| 3. 業務ロジック | `config/facility.php`、Enum、モデルのメソッド、`Domain/`（`Reservations/`・`Calendar/`・`Facility/`）、イベント・リスナー、メール |
 | 4. API | ルート、FormRequest、Policy、Resource、Controller、エラー形式、回数制限、TrustProxies |
 | 5. フロントの土台 | `lib/`、各機能の `logic/`、共通 UI 部品、レイアウト、Cache Components の設定、再検証の受け口 |
 | 6. 画面 | トップ → ログイン・会員登録 → マイページ → 管理画面 |

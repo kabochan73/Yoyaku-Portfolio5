@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Domain\Reservations\ReservationPhase;
+use App\Domain\Reservations\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\User;
-use App\Reservations\ReservationPhase;
-use App\Reservations\ReservationStatus;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
