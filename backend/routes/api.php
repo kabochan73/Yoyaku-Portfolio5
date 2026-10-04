@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,9 @@ Route::middleware('throttle:login')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [SessionController::class, 'destroy']);
+
+    Route::get('/user', [UserController::class, 'show']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
 });
 
 Route::get('/calendar', CalendarController::class)

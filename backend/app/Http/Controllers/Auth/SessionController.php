@@ -17,7 +17,7 @@ final class SessionController extends Controller
 {
     public function store(LoginRequest $request): UserResource
     {
-        if (! Auth::attempt($request->validated())) {
+        if (! Auth::guard('web')->attempt($request->validated())) {
             throw ValidationException::withMessages(['credentials' => __('auth.failed')]);
         }
 
