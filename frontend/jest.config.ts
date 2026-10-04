@@ -2,6 +2,7 @@ import type { Config } from "jest";
 import nextJest from "next/jest.js";
 
 process.env.API_URL ??= "http://api.test/api";
+process.env.BUILD_API_URL ??= "http://build.test/api";
 process.env.FRONTEND_URL ??= "http://frontend.test";
 process.env.REVALIDATE_SECRET ??= "test-secret";
 
