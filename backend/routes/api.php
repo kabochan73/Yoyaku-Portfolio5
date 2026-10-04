@@ -26,6 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user/reservations', [ReservationController::class, 'index']);
     Route::post('/reservations', [ReservationController::class, 'store']);
+    Route::post('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
 });
 
 Route::get('/calendar', CalendarController::class)
