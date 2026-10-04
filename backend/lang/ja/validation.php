@@ -39,6 +39,9 @@ return [
         'date' => [
             'after_or_equal' => '日付は今日以降を選んでください。',
         ],
+        'to' => [
+            'max_range' => '期間は:days日以内で指定してください。',
+        ],
     ],
 
     'attributes' => [

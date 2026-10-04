@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FacilityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/facility', FacilityController::class);
+
+Route::get('/calendar', CalendarController::class)
+    ->withoutMiddleware('throttle:api')
+    ->middleware(['throttle:calendar', 'cache.headers:private;no_cache;etag']);
 
 // デプロイ後に、Laravel から見た IP が利用者の IP になっているかを確かめるための口
 Route::get('/debug/ip', function (Request $request) {
