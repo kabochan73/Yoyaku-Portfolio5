@@ -41,6 +41,9 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin'])->group(functio
 
     Route::post('/reservations', [Admin\ReservationController::class, 'store']);
     Route::post('/reservations/{reservation}/cancel', [Admin\ReservationController::class, 'cancel']);
+
+    Route::put('/prices', [Admin\SettingsController::class, 'updatePrices']);
+    Route::put('/regular-holidays', [Admin\SettingsController::class, 'updateRegularHolidays']);
 });
 
 // デプロイ後に、Laravel から見た IP が利用者の IP になっているかを確かめるための口
