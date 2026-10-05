@@ -72,7 +72,8 @@ export function Dialog({
         <h2 id={titleId} className="text-lg font-bold">
           {title}
         </h2>
-        {children}
+        {/* 最初の描画では必ず閉じているので、サーバーとブラウザで中身が食い違わない */}
+        {open && children}
       </div>
     </dialog>
   );

@@ -37,6 +37,17 @@ test("開くまでは見えず、開くとタイトルを名前にしたダイ�
   expect(await openDialog()).toBeVisible();
 });
 
+test("閉じている間は、中身を描画しない", async () => {
+  render(<Example />);
+
+  expect(screen.queryByLabelText("予約者名")).not.toBeInTheDocument();
+  const dialog = await openDialog();
+  expect(screen.getByLabelText("予約者名")).toBeInTheDocument();
+
+  fireEvent(dialog, new Event("cancel", { cancelable: true }));
+  expect(screen.queryByLabelText("予約者名")).not.toBeInTheDocument();
+});
+
 test("開くと、最初の入力欄にフォーカスが移る", async () => {
   render(<Example />);
 
