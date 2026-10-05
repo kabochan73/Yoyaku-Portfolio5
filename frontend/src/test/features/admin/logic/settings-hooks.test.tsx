@@ -197,14 +197,14 @@ describe("利用者の検索", () => {
       { search: " 山田 " },
     );
     await waitFor(() =>
-      expect(result.current.data?.[0]?.name).toBe("山田さん"),
+      expect(result.current.data?.users[0]?.name).toBe("山田さん"),
     );
 
     rerender({ search: "佐藤" });
 
-    expect(result.current.data?.[0]?.name).toBe("山田さん");
+    expect(result.current.data?.users[0]?.name).toBe("山田さん");
     await waitFor(() =>
-      expect(result.current.data?.[0]?.name).toBe("佐藤さん"),
+      expect(result.current.data?.users[0]?.name).toBe("佐藤さん"),
     );
     expect(searched).toEqual(["山田", "佐藤"]);
   });

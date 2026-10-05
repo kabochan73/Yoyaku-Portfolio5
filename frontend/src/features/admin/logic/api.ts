@@ -9,6 +9,7 @@ import type {
   NewHoliday,
   NewPhoneReservation,
   Prices,
+  UserSearchResult,
 } from "./types";
 
 export async function fetchAdminCalendar(
@@ -67,11 +68,12 @@ export async function deleteHoliday(id: number): Promise<void> {
   await api.delete(`/admin/holidays/${id}`);
 }
 
-export async function searchUsers(search: string): Promise<AdminUser[]> {
-  const { data } = await api.get<{ data: AdminUser[] }>("/admin/users", {
-    params: { search },
-  });
-  return data.data;
+export async function searchUsers(search: string): Promise<UserSearchResult> {
+  const { data } = await api.get<{
+    data: AdminUser[];
+    meta: { limit: number };
+  }>("/admin/users", { params: { search } });
+  return { users: data.data, limit: data.meta.limit };
 }
 
 // 予約が入っている日を休業日にしようとして断られたときだけ、その件数を返す

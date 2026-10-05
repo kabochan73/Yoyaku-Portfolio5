@@ -5,6 +5,7 @@ import { ProfileForm } from "@/features/auth/components/ProfileForm";
 import { HolidayManager } from "./HolidayManager";
 import { PriceForm } from "./PriceForm";
 import { RegularHolidayForm } from "./RegularHolidayForm";
+import { UserSearch } from "./UserSearch";
 
 export function AdminSettings() {
   return (
@@ -17,6 +18,9 @@ export function AdminSettings() {
       </Accordion>
       <Accordion title="臨時休業日">
         <HolidayManager />
+      </Accordion>
+      <Accordion title="会員検索">
+        <UserSearch />
       </Accordion>
       <Accordion title="プロフィール設定">
         <ProfileForm />

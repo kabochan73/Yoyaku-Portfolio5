@@ -54,3 +54,9 @@ export type AdminUser = {
   email: string;
   confirmed_reservations_count: number;
 };
+
+export type UserSearchResult = {
+  users: AdminUser[];
+  // この件数ちょうどなら、まだ続きがあるかもしれない
+  limit: number;
+};
