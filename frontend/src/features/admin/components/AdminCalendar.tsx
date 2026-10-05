@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Alert } from "@/components/ui/Alert";
 import { ErrorState } from "@/components/ui/ErrorState";
 import {
   CalendarGrid,
@@ -8,19 +9,39 @@ import {
 } from "@/features/calendar/components/CalendarGrid";
 import { CalendarSkeleton } from "@/features/calendar/components/CalendarSkeleton";
 import { SlotCell } from "@/features/calendar/components/SlotCell";
+import { SelectionHint } from "@/features/calendar/components/SelectionHint";
 import { WeekNavigator } from "@/features/calendar/components/WeekNavigator";
+import {
+  endCandidates,
+  IDLE,
+  selectSlot,
+  slotMarkOf,
+  type GetStatus,
+  type Selection,
+} from "@/features/calendar/logic/selection";
 import { useFacility } from "@/features/facility/logic/hooks";
 import { addDays, mondayOf, todayInTokyo } from "@/lib/date";
 import { useAdminCalendar } from "../logic/hooks";
 import type { AdminReservation } from "../logic/types";
 import { AdminReservationDialog } from "./AdminReservationDialog";
 import { BookedSlotCell } from "./BookedSlotCell";
+import { PhoneReservationDialog } from "./PhoneReservationDialog";
 
 export function AdminCalendar() {
   const { data: facility } = useFacility();
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayInTokyo()));
   const [opened, setOpened] = useState<AdminReservation | null>(null);
+  const [selection, setSelection] = useState<Selection>(IDLE);
+  const [reserved, setReserved] = useState(false);
+  const reservedRef = useRef<HTMLDivElement>(null);
   const calendar = useAdminCalendar(weekStart);
+
+  // 登録した枠は予約者名のボタンに置き換わり、ダイアログを開いたボタンへフォーカスを戻せないので、メッセージへ移す
+  useEffect(() => {
+    if (reserved) {
+      reservedRef.current?.focus();
+    }
+  }, [reserved]);
 
   if (!facility) {
     return null;
@@ -31,6 +52,27 @@ export function AdminCalendar() {
   const oldestDate = data?.meta.oldest_date;
   // 週の切り替え中は前の週の枠を出したままにするので、押させない
   const switching = calendar.isPlaceholderData;
+  const rules = {
+    minHours: facility.rules.min_hours,
+    maxHours: facility.rules.max_hours,
+  };
+  const getStatus: GetStatus = (date, hour) =>
+    switching
+      ? undefined
+      : data?.data
+          .find((day) => day.date === date)
+          ?.slots.find((slot) => slot.hour === hour)?.status;
+  const candidates = endCandidates(selection, getStatus, rules);
+
+  const changeSelection = (next: Selection) => {
+    setSelection(next);
+    setReserved(false);
+  };
+
+  const changeWeek = (week: string) => {
+    setWeekStart(week);
+    changeSelection(IDLE);
+  };
 
   return (
     <div className="space-y-4">
@@ -38,8 +80,18 @@ export function AdminCalendar() {
         weekStart={weekStart}
         canPrev={oldestDate !== undefined && weekStart > mondayOf(oldestDate)}
         canNext
-        onPrev={() => setWeekStart(addDays(weekStart, -7))}
-        onNext={() => setWeekStart(addDays(weekStart, 7))}
+        onPrev={() => changeWeek(addDays(weekStart, -7))}
+        onNext={() => changeWeek(addDays(weekStart, 7))}
+      />
+      {reserved && (
+        <div ref={reservedRef} tabIndex={-1} className="outline-none">
+          <Alert tone="success">電話予約を登録しました。</Alert>
+        </div>
+      )}
+      <SelectionHint
+        selection={selection}
+        candidateCount={candidates.length}
+        rules={rules}
       />
       {data ? (
         <CalendarGrid
@@ -83,7 +135,13 @@ export function AdminCalendar() {
                 date={date}
                 hour={hour}
                 status={slot?.status ?? "closed"}
+                mark={slotMarkOf(selection, candidates, date, hour)}
                 disabled={switching}
+                onSelect={() =>
+                  changeSelection(
+                    selectSlot(selection, { date, hour }, getStatus, rules),
+                  )
+                }
               />
             );
           }}
@@ -99,6 +157,22 @@ export function AdminCalendar() {
       <AdminReservationDialog
         reservation={opened}
         onClose={() => setOpened(null)}
+      />
+      <PhoneReservationDialog
+        slot={
+          selection.kind === "complete"
+            ? {
+                date: selection.date,
+                start_hour: selection.startHour,
+                end_hour: selection.endHour,
+              }
+            : null
+        }
+        onClose={() => setSelection(IDLE)}
+        onReserved={() => {
+          setSelection(IDLE);
+          setReserved(true);
+        }}
       />
     </div>
   );

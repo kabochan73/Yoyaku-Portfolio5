@@ -2,6 +2,7 @@ import {
   endCandidates,
   IDLE,
   selectSlot,
+  slotMarkOf,
   type GetStatus,
   type Selection,
 } from "@/features/calendar/logic/selection";
@@ -141,4 +142,33 @@ test("完了の後に空きを押すと、新しい開始になる", () => {
       [DAY, 15],
     ]),
   ).toEqual({ kind: "start", date: DAY, hour: 15 });
+});
+
+describe("枠の印", () => {
+  test("未選択なら印は無い", () => {
+    expect(slotMarkOf(IDLE, [], DAY, 10)).toBeUndefined();
+  });
+
+  test("開始を選択中なら、開始の枠と終了候補に印を付ける。別の日には付けない", () => {
+    const selection: Selection = { kind: "start", date: DAY, hour: 10 };
+    const candidates = [11, 12, 13];
+
+    expect(slotMarkOf(selection, candidates, DAY, 10)).toBe("start");
+    expect(slotMarkOf(selection, candidates, DAY, 12)).toBe("candidate");
+    expect(slotMarkOf(selection, candidates, DAY, 14)).toBeUndefined();
+    expect(slotMarkOf(selection, candidates, NEXT_DAY, 11)).toBeUndefined();
+  });
+
+  test("選び終わったら、開始から終了の前の時までが選択中", () => {
+    const selection: Selection = {
+      kind: "complete",
+      date: DAY,
+      startHour: 10,
+      endHour: 12,
+    };
+
+    expect(slotMarkOf(selection, [], DAY, 10)).toBe("selected");
+    expect(slotMarkOf(selection, [], DAY, 11)).toBe("selected");
+    expect(slotMarkOf(selection, [], DAY, 12)).toBeUndefined();
+  });
 });

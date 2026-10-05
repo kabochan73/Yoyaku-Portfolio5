@@ -63,3 +63,26 @@ export function selectSlot(
 
   return { kind: "start", date: clicked.date, hour: clicked.hour };
 }
+
+export type SlotMark = "start" | "candidate" | "selected";
+
+// candidates は endCandidates の結果。枠ごとに計算し直さないよう、外で1回だけ求めて渡す
+export function slotMarkOf(
+  selection: Selection,
+  candidates: number[],
+  date: string,
+  hour: number,
+): SlotMark | undefined {
+  if (selection.kind === "idle" || selection.date !== date) {
+    return undefined;
+  }
+  if (selection.kind === "start") {
+    if (hour === selection.hour) {
+      return "start";
+    }
+    return candidates.includes(hour) ? "candidate" : undefined;
+  }
+  return hour >= selection.startHour && hour < selection.endHour
+    ? "selected"
+    : undefined;
+}

@@ -1,4 +1,5 @@
 import { formatHourRange, formatMonthDayJa } from "@/lib/format";
+import type { SlotMark } from "../logic/selection";
 import type { SlotStatus } from "../logic/types";
 
 const LOOKS: Record<
@@ -31,8 +32,6 @@ const LOOKS: Record<
     className: "text-zinc-300",
   },
 };
-
-export type SlotMark = "start" | "candidate" | "selected";
 
 const CHOSEN_CLASS_NAME = "bg-primary text-white hover:bg-primary-hover";
 

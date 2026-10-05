@@ -139,17 +139,22 @@ describe("表示", () => {
   });
 
   test("前の週は、遡れる最初の日を含む週まで", async () => {
+    server.use(
+      http.get("/api/admin/calendar", ({ request }) => {
+        const from = new URL(request.url).searchParams.get("from") ?? "";
+        const calendar = calendarOf(from);
+        // 9/30（水）を含む週は 9/28〜
+        calendar.meta.oldest_date = "2026-09-30";
+        return HttpResponse.json(calendar);
+      }),
+    );
     renderCalendar();
     await screen.findByRole("button", { name: MEMBER_SLOT });
     const prev = screen.getByRole("button", { name: "← 前の週" });
 
-    // 7/7（火）を含む週は 7/6〜。今週から13週戻れる
-    for (let i = 0; i < 13; i++) {
-      await waitFor(() => expect(prev).toBeEnabled());
-      await userEvent.click(prev);
-    }
+    await userEvent.click(prev);
 
-    expect(screen.getByText("7/6 〜 7/12")).toBeInTheDocument();
+    expect(screen.getByText("9/28 〜 10/4")).toBeInTheDocument();
     await waitFor(() => expect(prev).toBeDisabled());
   });
 
@@ -158,11 +163,11 @@ describe("表示", () => {
     await screen.findByRole("button", { name: MEMBER_SLOT });
     const next = screen.getByRole("button", { name: "次の週 →" });
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       await userEvent.click(next);
     }
 
-    expect(screen.getByText("11/30 〜 12/6")).toBeInTheDocument();
+    expect(screen.getByText("11/16 〜 11/22")).toBeInTheDocument();
     expect(next).toBeEnabled();
   });
 });
@@ -261,5 +266,56 @@ describe("予約の詳細", () => {
       "この予約はキャンセルできません",
     );
     expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+});
+
+describe("電話予約", () => {
+  const FRI = "10月9日（金）";
+
+  async function chooseTwoHours() {
+    await userEvent.click(
+      await screen.findByRole("button", { name: `${FRI} 12:00 〜 13:00 空き` }),
+    );
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: `${FRI} 13:00 〜 14:00 空き（終了候補）`,
+      }),
+    );
+  }
+
+  test("空きを開始・終了の順に選ぶと、電話予約のダイアログが開く", async () => {
+    renderCalendar();
+
+    await chooseTwoHours();
+
+    const dialog = screen.getByRole("dialog", { name: "電話予約の登録" });
+    expect(dialog).toHaveTextContent("2026年10月9日（金）");
+    expect(dialog).toHaveTextContent("12:00 〜 14:00");
+  });
+
+  test("登録できたら、閉じてカレンダーを取り直し、メッセージにフォーカスを移す", async () => {
+    let sent: unknown;
+    server.use(
+      http.post("/api/admin/reservations", async ({ request }) => {
+        sent = await request.json();
+        return HttpResponse.json({ data: { id: 9 } }, { status: 201 });
+      }),
+    );
+    renderCalendar();
+    await chooseTwoHours();
+    requestedWeeks = [];
+
+    await userEvent.type(screen.getByLabelText("予約者名"), "田中{Enter}");
+
+    const message = await screen.findByText("電話予約を登録しました。");
+    expect(sent).toEqual({
+      date: "2026-10-09",
+      start_hour: 12,
+      end_hour: 14,
+      booker_name: "田中",
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(message.closest("[tabindex]")).toHaveFocus();
+    await waitFor(() => expect(requestedWeeks).toContain(THIS_WEEK));
   });
 });

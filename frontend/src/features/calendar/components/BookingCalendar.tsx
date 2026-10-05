@@ -12,6 +12,7 @@ import {
   endCandidates,
   IDLE,
   selectSlot,
+  slotMarkOf,
   type GetStatus,
   type Selection,
 } from "../logic/selection";
@@ -19,28 +20,8 @@ import type { InitialCalendar } from "../logic/server";
 import { CalendarGrid, DayHeading } from "./CalendarGrid";
 import { CalendarSkeleton } from "./CalendarSkeleton";
 import { SelectionHint } from "./SelectionHint";
-import { SlotCell, type SlotMark } from "./SlotCell";
+import { SlotCell } from "./SlotCell";
 import { WeekNavigator } from "./WeekNavigator";
-
-function markOf(
-  selection: Selection,
-  candidates: number[],
-  date: string,
-  hour: number,
-): SlotMark | undefined {
-  if (selection.kind === "idle" || selection.date !== date) {
-    return undefined;
-  }
-  if (selection.kind === "start") {
-    if (hour === selection.hour) {
-      return "start";
-    }
-    return candidates.includes(hour) ? "candidate" : undefined;
-  }
-  return hour >= selection.startHour && hour < selection.endHour
-    ? "selected"
-    : undefined;
-}
 
 export function BookingCalendar({
   initialCalendar,
@@ -146,7 +127,7 @@ export function BookingCalendar({
                 date={date}
                 hour={hour}
                 status={slot?.status ?? "closed"}
-                mark={markOf(selection, candidates, date, hour)}
+                mark={slotMarkOf(selection, candidates, date, hour)}
                 disabled={switching}
                 onSelect={() =>
                   changeSelection(
