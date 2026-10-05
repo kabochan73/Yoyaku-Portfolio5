@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { Dialog } from "@/components/ui/Dialog";
@@ -92,4 +92,28 @@ test("中身を押しても閉じない", async () => {
   await userEvent.click(screen.getByLabelText("予約者名"));
 
   expect(screen.getByRole("dialog")).toBeVisible();
+});
+
+describe("ブラウザが自分で閉じたとき", () => {
+  test("閉じてよいなら、開いていた状態も閉じる", async () => {
+    render(<Example />);
+    const dialog = (await openDialog()) as HTMLDialogElement;
+
+    act(() => dialog.close());
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "電話予約を登録" }),
+    ).toHaveFocus();
+  });
+
+  test("閉じられないときは、開き直す", async () => {
+    render(<Example closable={false} />);
+    const dialog = (await openDialog()) as HTMLDialogElement;
+
+    act(() => dialog.close());
+
+    expect(dialog.open).toBe(true);
+    expect(screen.getByRole("dialog")).toBeVisible();
+  });
 });

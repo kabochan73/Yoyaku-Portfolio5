@@ -43,11 +43,14 @@ export function Dialog({
       first?.focus();
     }
 
-    if (!open && dialog.open) {
-      dialog.close();
+    if (!open) {
+      if (dialog.open) {
+        dialog.close();
+      }
       if (returnFocusRef.current?.isConnected) {
         returnFocusRef.current.focus();
       }
+      returnFocusRef.current = null;
     }
   }, [open]);
 
@@ -59,6 +62,17 @@ export function Dialog({
         event.preventDefault();
         if (closable) {
           onClose();
+        }
+      }}
+      // cancel を止めても、Esc を続けて押すとブラウザが閉じてしまうことがある。そのときは状態を合わせる
+      onClose={() => {
+        if (!open) {
+          return;
+        }
+        if (closable) {
+          onClose();
+        } else {
+          dialogRef.current?.showModal();
         }
       }}
       onClick={(event) => {
