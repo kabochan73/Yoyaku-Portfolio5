@@ -34,7 +34,7 @@ export function ReservationCard({
       </div>
       {reservation.is_cancellable ? (
         <Button
-          variant="secondary"
+          variant="danger"
           size="sm"
           onClick={onCancel}
           aria-label={`${formatMonthDayJa(date)} ${time} の予約をキャンセル`}
