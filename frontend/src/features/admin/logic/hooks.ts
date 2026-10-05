@@ -51,7 +51,8 @@ export function useCancelReservationAsAdmin() {
   const refreshCalendars = useRefreshCalendars();
   return useMutation({
     mutationFn: cancelReservationAsAdmin,
-    onSuccess: refreshCalendars,
+    // 開始済み・キャンセル済みで断られたときもカレンダーが古いので、取り直して最新にする
+    onSettled: refreshCalendars,
   });
 }
 

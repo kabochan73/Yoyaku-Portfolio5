@@ -23,7 +23,7 @@ export type AdminCalendarDay = Omit<CalendarDay, "slots"> & {
 };
 
 export type AdminCalendar = {
-  meta: CalendarMeta;
+  meta: CalendarMeta & { oldest_date: string };
   data: AdminCalendarDay[];
 };
 
