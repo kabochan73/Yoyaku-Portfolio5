@@ -4,7 +4,6 @@ import Link from "next/link";
 import { buttonClassName, Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useCurrentUser, useLogout } from "@/features/auth/logic/hooks";
-import { reloadTo } from "@/lib/navigation";
 
 const small = { size: "sm" } as const;
 
@@ -56,9 +55,7 @@ export function HeaderUserMenu() {
         variant="secondary"
         className="w-20"
         disabled={logout.isPending}
-        onClick={() =>
-          logout.mutate(undefined, { onSuccess: () => reloadTo("/") })
-        }
+        onClick={() => logout.mutate()}
       >
         ログアウト
       </Button>

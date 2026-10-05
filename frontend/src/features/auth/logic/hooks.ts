@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { reloadTo } from "@/lib/navigation";
 import { USER_FRESH_MS } from "@/lib/query-config";
 import { queryKeys } from "@/lib/query-keys";
 import {
@@ -38,13 +39,7 @@ export function useUpdateProfile() {
   return useMutation({ mutationFn: updateProfile, onSuccess: setCurrentUser });
 }
 
+// 読み直せばメモリ上のキャッシュはすべて消える。ユーザーを null にしないので、セッション切れの見張りも反応しない
 export function useLogout() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: logout,
-    onSuccess: () => {
-      queryClient.clear();
-      queryClient.setQueryData(queryKeys.user, null);
-    },
-  });
+  return useMutation({ mutationFn: logout, onSuccess: () => reloadTo("/") });
 }

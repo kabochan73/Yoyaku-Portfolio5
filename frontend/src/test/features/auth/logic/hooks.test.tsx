@@ -7,9 +7,12 @@ import {
   useLogin,
   useLogout,
 } from "@/features/auth/logic/hooks";
+import { reloadTo } from "@/lib/navigation";
 import { queryKeys } from "@/lib/query-keys";
 import { server } from "@/test/msw/server";
 import { createTestQueryClient } from "@/test/render";
+
+jest.mock("@/lib/navigation", () => ({ reloadTo: jest.fn() }));
 
 const taro = {
   id: 1,
@@ -78,13 +81,13 @@ test("ログインすると、/api/user を取り直さずに、返ってきた�
   expect(userRequests).toBe(1);
 });
 
-test("ログアウトすると、ユーザーを null にし、ほかのキャッシュも消す", async () => {
+test("ログアウトできたら、ユーザーを null にせず、トップを読み直す", async () => {
   const { queryClient, result } = setup();
+  await waitFor(() => expect(result.current.currentUser.isSuccess).toBe(true));
   queryClient.setQueryData(queryKeys.user, taro);
-  queryClient.setQueryData(queryKeys.myReservations, [{ id: 1 }]);
 
   await act(() => result.current.logout.mutateAsync());
 
-  expect(queryClient.getQueryData(queryKeys.user)).toBeNull();
-  expect(queryClient.getQueryData(queryKeys.myReservations)).toBeUndefined();
+  expect(reloadTo).toHaveBeenCalledWith("/");
+  expect(queryClient.getQueryData(queryKeys.user)).toEqual(taro);
 });
