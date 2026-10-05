@@ -33,5 +33,9 @@ export function useCreateReservation() {
 
 export function useCancelReservation() {
   const refresh = useRefreshAfterChange();
-  return useMutation({ mutationFn: cancelReservation, onSuccess: refresh });
+  return useMutation({
+    mutationFn: cancelReservation,
+    // 開始済み・キャンセル済みで断られたときは一覧が古いので、取り直して最新にする
+    onSettled: refresh,
+  });
 }

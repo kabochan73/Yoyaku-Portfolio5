@@ -138,3 +138,24 @@ test("キャンセルできたら、カレンダーと予約一覧を取り直�
   expect(isInvalidated(queryClient, CALENDAR_KEY)).toBe(true);
   expect(isInvalidated(queryClient, queryKeys.myReservations)).toBe(true);
 });
+
+test("キャンセルを断られても、予約一覧を取り直させる", async () => {
+  server.use(
+    http.post("/api/reservations/:id/cancel", () =>
+      HttpResponse.json(
+        {
+          message:
+            "この予約はキャンセルできません（開始済み、またはキャンセル済み）。",
+          code: "reservation_not_cancellable",
+        },
+        { status: 409 },
+      ),
+    ),
+  );
+  const { queryClient, result } = setup();
+
+  act(() => result.current.cancel.mutate(1));
+
+  await waitFor(() => expect(result.current.cancel.isError).toBe(true));
+  expect(isInvalidated(queryClient, queryKeys.myReservations)).toBe(true);
+});
