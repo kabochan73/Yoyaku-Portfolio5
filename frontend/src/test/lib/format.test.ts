@@ -2,11 +2,16 @@ import {
   formatDateJa,
   formatHour,
   formatHourRange,
+  formatMonthDayJa,
   formatShortDate,
   formatWeekRange,
   formatWeekdays,
   formatYen,
 } from "@/lib/format";
+
+test("formatMonthDayJa は年なしの日付", () => {
+  expect(formatMonthDayJa("2026-10-06")).toBe("10月6日（火）");
+});
 
 test("formatDateJa は曜日付きの長い日付", () => {
   expect(formatDateJa("2026-10-06")).toBe("2026年10月6日（火）");

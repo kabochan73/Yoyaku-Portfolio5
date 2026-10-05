@@ -16,6 +16,11 @@ export function formatDateJa(date: string): string {
   return `${year}年${month}月${day}日（${weekdayOf(date)}）`;
 }
 
+export function formatMonthDayJa(date: string): string {
+  const { month, day } = parts(date);
+  return `${month}月${day}日（${weekdayOf(date)}）`;
+}
+
 export function formatShortDate(date: string): string {
   const { month, day } = parts(date);
   return `${month}/${day}（${weekdayOf(date)}）`;
