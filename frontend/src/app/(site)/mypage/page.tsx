@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Accordion } from "@/components/ui/Accordion";
+import { ProfileForm } from "@/features/auth/components/ProfileForm";
 import { MyReservationList } from "@/features/reservations/components/MyReservationList";
 
 export const metadata: Metadata = {
@@ -17,6 +19,9 @@ export default function MypagePage() {
         <h2 className="text-xl font-bold">今後の予約</h2>
         <MyReservationList />
       </section>
+      <Accordion title="プロフィール設定">
+        <ProfileForm />
+      </Accordion>
     </div>
   );
 }
