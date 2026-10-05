@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminCalendar } from "@/features/admin/components/AdminCalendar";
+import { AdminSettings } from "@/features/admin/components/AdminSettings";
 
 export const metadata: Metadata = {
   title: "管理画面",
@@ -16,6 +17,10 @@ export default function AdminPage() {
       <section className="space-y-4">
         <h2 className="text-xl font-bold">予約カレンダー</h2>
         <AdminCalendar />
+      </section>
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold">設定</h2>
+        <AdminSettings />
       </section>
     </div>
   );
