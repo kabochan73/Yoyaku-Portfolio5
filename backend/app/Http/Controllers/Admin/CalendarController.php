@@ -21,6 +21,7 @@ final class CalendarController extends Controller
             ->additional(['meta' => [
                 'today' => $now->toDateString(),
                 'bookable_until' => $rules->bookableUntil($now)->toDateString(),
+                'oldest_date' => $query->oldestAdminDate($now)->toDateString(),
             ]]);
     }
 }

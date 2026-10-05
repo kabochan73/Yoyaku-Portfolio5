@@ -75,3 +75,9 @@ it('ETag を付ける', function () {
         ->getJson('/api/admin/calendar?from=2026-10-09&to=2026-10-09')
         ->assertHeader('ETag');
 });
+
+it('遡って見られる最初の日を meta に返す', function () {
+    $this->actingAs($this->admin)
+        ->getJson('/api/admin/calendar?from=2026-10-05&to=2026-10-11')
+        ->assertJsonPath('meta.oldest_date', '2026-07-06');
+});

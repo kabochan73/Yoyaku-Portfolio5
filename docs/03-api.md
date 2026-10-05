@@ -187,7 +187,7 @@ Route::get('/calendar', ...)->middleware('cache.headers:private;no_cache;etag');
 
 ```json
 {
-  "meta": { "today": "2026-10-06", "bookable_until": "2026-11-06" },
+  "meta": { "today": "2026-10-06", "bookable_until": "2026-11-06", "oldest_date": "2026-07-06" },
   "data": [
     {
       "date": "2026-10-05",
@@ -212,6 +212,7 @@ Route::get('/calendar', ...)->middleware('cache.headers:private;no_cache;etag');
 - 枠の `status`: `/calendar` の3種類に加えて `closed`（受付外の日の、予約が無い枠）
 - `booked` の枠は `reservation_id` を持つ。予約の中身は日ごとの `reservations` に1回だけ入れる（2〜4枠にまたがる予約を枠ごとに重複させない）
 - 受付外の日も全12枠を返し、予約がある枠は `booked` にする。定休日に残った予約を確認・キャンセルできるようにするため
+- `meta.oldest_date`: 遡って予約を見られる最初の日（今日の3か月前）。フロントは前の週への移動をこの日を含む週までにする
 - 3か月より前の日は `slots: []`、`reservations: []`（予約の保持期間外）
 
 ### POST `/reservations`

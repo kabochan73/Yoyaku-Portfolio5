@@ -44,12 +44,20 @@ final readonly class CalendarQuery
     }
 
     /**
+     * 管理者が遡って予約を見られる最初の日。これより前の日は予約を返さない
+     */
+    public function oldestAdminDate(CarbonImmutable $now): CarbonImmutable
+    {
+        return $now->startOfDay()->subMonthsNoOverflow((int) config('facility.rules.admin_lookback_months'));
+    }
+
+    /**
      * @return list<AdminCalendarDay>
      */
     public function forAdmin(CarbonImmutable $from, CarbonImmutable $to, CarbonImmutable $now): array
     {
         $regularHolidays = $this->cache->regularHolidays();
-        $oldestKept = $now->startOfDay()->subMonthsNoOverflow((int) config('facility.rules.admin_lookback_months'));
+        $oldestKept = $this->oldestAdminDate($now);
 
         $days = [];
         foreach ($this->cache->days($from, $to) as $date => $facts) {
