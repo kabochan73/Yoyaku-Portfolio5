@@ -133,7 +133,7 @@ PHP のテストで本当に並行リクエストを出すのは難しいので�
 | `ReservationCard` | `phase` に応じて「キャンセル」ボタン /「ご利用中」/「ご利用済み」が出る |
 | `CancelDialog` / `AdminReservationDialog` | キャンセルが 409 → ダイアログが開いたままエラーが出る |
 | `PriceForm` / `RegularHolidayForm` | `/facility` の応答前は保存ボタンが無い。応答後に今の値が入る |
-| `HeaderUserMenu` | 取得中はボタンと同じ大きさのスケルトン / 取得後にゲスト・会員・管理者のボタンに変わる |
+| `HeaderUserMenu` | 取得中は何も出さない / 取得後にゲスト・会員・管理者のボタンに変わる |
 | `/internal/revalidate` | 合言葉なし・違う値は 401 / 正しい値で `revalidateTag("facility", { expire: 0 })` が呼ばれる |
 | `Dialog` | 開いたらフォーカスが中に移る / Esc で閉じる / 閉じたらフォーカスが戻る / 送信中は閉じない |
 | フォーム | Zod のエラー表示 / サーバーの 422 が項目ごとに出る / `credentials` はフォームの上に出る |

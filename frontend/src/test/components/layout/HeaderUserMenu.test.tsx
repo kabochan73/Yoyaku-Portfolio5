@@ -38,11 +38,11 @@ beforeEach(() => {
   jest.mocked(reloadTo).mockClear();
 });
 
-test("取得中はボタン2つ分のスケルトン", () => {
+test("取得中は何も出さない", () => {
   respondUser(null);
   renderWithClient(<HeaderUserMenu />);
 
-  expect(screen.getByTestId("header-user-menu-loading")).toBeInTheDocument();
+  expect(screen.queryByRole("button")).not.toBeInTheDocument();
   expect(screen.queryByRole("link")).not.toBeInTheDocument();
 });
 
@@ -71,25 +71,27 @@ test("取得に失敗したときも、ゲストと同じ表示", async () => {
   expect(linkNames()).toEqual(["ログイン", "新規登録"]);
 });
 
-test("会員には、マイページとログアウト", async () => {
+test("会員には、My Page とログアウト", async () => {
   respondUser(member);
   renderWithClient(<HeaderUserMenu />);
 
-  expect(
-    await screen.findByRole("link", { name: "マイページ" }),
-  ).toHaveAttribute("href", "/mypage");
-  expect(linkNames()).toEqual(["マイページ"]);
+  expect(await screen.findByRole("link", { name: "My Page" })).toHaveAttribute(
+    "href",
+    "/mypage",
+  );
+  expect(linkNames()).toEqual(["My Page"]);
   expect(screen.getByRole("button", { name: "ログアウト" })).toBeEnabled();
 });
 
-test("管理者には、管理者ページとログアウト", async () => {
+test("管理者には、管理者とログアウト", async () => {
   respondUser(admin);
   renderWithClient(<HeaderUserMenu />);
 
-  expect(
-    await screen.findByRole("link", { name: "管理者ページ" }),
-  ).toHaveAttribute("href", "/admin");
-  expect(linkNames()).toEqual(["管理者ページ"]);
+  expect(await screen.findByRole("link", { name: "管理者" })).toHaveAttribute(
+    "href",
+    "/admin",
+  );
+  expect(linkNames()).toEqual(["管理者"]);
 });
 
 test("ログアウト中はボタンを押せず、終わったらトップを読み直す", async () => {

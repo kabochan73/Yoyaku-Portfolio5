@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { buttonClassName, Button } from "@/components/ui/Button";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { useCurrentUser, useLogout } from "@/features/auth/logic/hooks";
 
 const small = { size: "sm" } as const;
@@ -12,12 +11,7 @@ export function HeaderUserMenu() {
   const logout = useLogout();
 
   if (isPending) {
-    return (
-      <div className="flex gap-2" data-testid="header-user-menu-loading">
-        <Skeleton className="h-8 w-20" />
-        <Skeleton className="h-8 w-20" />
-      </div>
-    );
+    return null;
   }
 
   // 取得に失敗したときもゲストと同じ表示にする。ヘッダーでエラーを出しても利用者にはどうしようもない
@@ -26,11 +20,11 @@ export function HeaderUserMenu() {
       <nav className="flex gap-2">
         <Link
           href="/login"
-          className={`${buttonClassName({ ...small, variant: "secondary" })} w-20`}
+          className={`${buttonClassName({ ...small, variant: "secondary" })} w-24`}
         >
           ログイン
         </Link>
-        <Link href="/register" className={`${buttonClassName(small)} w-20`}>
+        <Link href="/register" className={`${buttonClassName(small)} w-24`}>
           新規登録
         </Link>
       </nav>
@@ -39,21 +33,21 @@ export function HeaderUserMenu() {
 
   const home =
     user.role === "admin"
-      ? { href: "/admin", label: "管理者ページ" }
-      : { href: "/mypage", label: "マイページ" };
+      ? { href: "/admin", label: "管理者" }
+      : { href: "/mypage", label: "My Page" };
 
   return (
     <nav className="flex gap-2">
       <Link
         href={home.href}
-        className={`${buttonClassName({ ...small, variant: "secondary" })} min-w-20`}
+        className={`${buttonClassName({ ...small, variant: "secondary" })} min-w-24`}
       >
         {home.label}
       </Link>
       <Button
         {...small}
         variant="secondary"
-        className="w-20"
+        className="w-24"
         disabled={logout.isPending}
         onClick={() => logout.mutate()}
       >

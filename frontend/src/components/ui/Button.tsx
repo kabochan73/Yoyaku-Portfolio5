@@ -5,7 +5,7 @@ type Size = "sm" | "md";
 
 const variantClasses: Record<Variant, string> = {
   primary: "bg-primary text-white hover:bg-primary-hover",
-  secondary: "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-50",
+  secondary: "border-1 border-zinc-600 bg-white text-zinc-900 hover:bg-zinc-50",
   danger: "bg-danger text-white hover:bg-danger-hover",
 };
 
@@ -26,7 +26,7 @@ export function buttonClassName({
   variant = "primary",
   size = "md",
 }: Style = {}): string {
-  return `inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]}`;
+  return `inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]}`;
 }
 
 export function Button({
