@@ -14,14 +14,24 @@ const sizeClasses: Record<Size, string> = {
   md: "h-10 px-4",
 };
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+type Style = {
   variant?: Variant;
   size?: Size;
 };
 
-export function Button({
+type Props = ButtonHTMLAttributes<HTMLButtonElement> & Style;
+
+// リンクをボタンと同じ見た目にするときにも使う
+export function buttonClassName({
   variant = "primary",
   size = "md",
+}: Style = {}): string {
+  return `inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]}`;
+}
+
+export function Button({
+  variant,
+  size,
   type = "button",
   className = "",
   ...props
@@ -29,7 +39,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${buttonClassName({ variant, size })} ${className}`}
       {...props}
     />
   );
