@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Alert } from "@/components/ui/Alert";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClassName } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { useCurrentUser } from "@/features/auth/logic/hooks";
 import { useFacility } from "@/features/facility/logic/hooks";
@@ -99,6 +99,11 @@ export function ReservationConfirmDialog({
       {user === null && (
         <p className="text-sm text-zinc-700">予約にはログインが必要です。</p>
       )}
+      {user?.role === "admin" && (
+        <p className="text-sm text-zinc-700">
+          管理者は、管理画面の電話予約から登録してください。
+        </p>
+      )}
       <div className="flex justify-end gap-2">
         <Button variant="secondary" disabled={submitting} onClick={onClose}>
           戻る
@@ -107,6 +112,10 @@ export function ReservationConfirmDialog({
           <Button onClick={() => router.push("/login")}>
             ログインして予約
           </Button>
+        ) : user?.role === "admin" ? (
+          <Link href="/admin" className={buttonClassName()}>
+            管理画面へ
+          </Link>
         ) : (
           <Button
             disabled={userPending || submitting || slotTaken}

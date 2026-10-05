@@ -32,6 +32,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         Gate::define('admin', fn (User $user): bool => $user->role === UserRole::Admin);
+        Gate::define('member', fn (User $user): bool => $user->role === UserRole::User);
 
         TrustProxies::at(array_map('trim', explode(',', (string) config('app.trusted_proxies'))));
     }

@@ -87,6 +87,22 @@ test("未ログインなら、ログインが必要と出し、ログイン画�
   expect(push).toHaveBeenCalledWith("/login");
 });
 
+test("管理者には予約するボタンを出さず、管理画面の電話予約へ案内する", async () => {
+  signedInAs({ ...member, role: "admin" });
+  renderDialog();
+
+  expect(
+    await screen.findByText(
+      "管理者は、管理画面の電話予約から登録してください。",
+    ),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "管理画面へ" })).toHaveAttribute(
+    "href",
+    "/admin",
+  );
+  expect(screen.queryByRole("button", { name: "予約する" })).toBeNull();
+});
+
 test("送信中は「予約中...」になり、戻るも Esc も効かない", async () => {
   signedInAs(member);
   let release = () => {};

@@ -48,6 +48,13 @@ describe('GET /user/reservations', function () {
             ]]]);
     });
 
+    it('管理者は 403', function () {
+        $this->actingAs(User::factory()->admin()->create())
+            ->getJson('/api/user/reservations')
+            ->assertForbidden()
+            ->assertJsonPath('code', 'forbidden');
+    });
+
     it('ログインしていなければ 401', function () {
         $this->getJson('/api/user/reservations')->assertUnauthorized();
     });
@@ -98,6 +105,15 @@ describe('POST /reservations', function () {
             ->postJson('/api/reservations', ['date' => '2026-10-10', 'start_hour' => 14, 'end_hour' => 16])
             ->assertConflict()
             ->assertJsonPath('code', 'already_booked_that_day');
+    });
+
+    it('管理者は 403（電話予約から入れる）', function () {
+        $this->actingAs(User::factory()->admin()->create())
+            ->postJson('/api/reservations', ['date' => '2026-10-09', 'start_hour' => 10, 'end_hour' => 12])
+            ->assertForbidden()
+            ->assertJsonPath('code', 'forbidden');
+
+        expect(Reservation::query()->count())->toBe(0);
     });
 
     it('ログインしていなければ 401', function () {

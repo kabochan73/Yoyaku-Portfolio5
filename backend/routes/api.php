@@ -29,9 +29,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'show']);
     Route::put('/user/profile', [UserController::class, 'updateProfile']);
 
-    Route::get('/user/reservations', [ReservationController::class, 'index']);
-    Route::post('/reservations', [ReservationController::class, 'store']);
-    Route::post('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
+    // 管理者の予約は電話予約（/admin/reservations）から入れる
+    Route::middleware('can:member')->group(function () {
+        Route::get('/user/reservations', [ReservationController::class, 'index']);
+        Route::post('/reservations', [ReservationController::class, 'store']);
+        Route::post('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel']);
+    });
 });
 
 Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin'])->group(function () {
