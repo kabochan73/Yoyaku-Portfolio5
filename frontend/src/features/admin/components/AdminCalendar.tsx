@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert } from "@/components/ui/Alert";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import {
   CalendarGrid,
   DayHeading,
@@ -28,7 +29,8 @@ import { BookedSlotCell } from "./BookedSlotCell";
 import { PhoneReservationDialog } from "./PhoneReservationDialog";
 
 export function AdminCalendar() {
-  const { data: facility } = useFacility();
+  const facilityQuery = useFacility();
+  const facility = facilityQuery.data;
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayInTokyo()));
   const [opened, setOpened] = useState<AdminReservation | null>(null);
   const [selection, setSelection] = useState<Selection>(IDLE);
@@ -43,8 +45,24 @@ export function AdminCalendar() {
     }
   }, [reserved]);
 
+  if (facilityQuery.isError) {
+    return (
+      <ErrorState
+        message="施設情報を取得できませんでした。"
+        onRetry={() => void facilityQuery.refetch()}
+      />
+    );
+  }
+
+  // 営業時間が分かるまでは表の行数が決まらないので、だいたい同じ高さの枠を出して、下の設定がずれないようにする
   if (!facility) {
-    return null;
+    return (
+      <div className="space-y-4" data-testid="admin-calendar-loading">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-[37rem] w-full" />
+      </div>
+    );
   }
 
   const { open_hour: openHour, close_hour: closeHour } = facility.rules;

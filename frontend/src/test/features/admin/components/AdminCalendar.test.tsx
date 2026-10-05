@@ -113,6 +113,40 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+describe("施設情報", () => {
+  // 管理画面には FacilityProvider が無く、ブラウザで DB の最新の施設情報を取る
+  test("届く前は、カレンダーとほぼ同じ高さのスケルトンを出し、届いたら表を出す", async () => {
+    let release = () => {};
+    const released = new Promise<void>((resolve) => (release = resolve));
+    server.use(
+      http.get("/api/facility", async () => {
+        await released;
+        return HttpResponse.json({ data: facility });
+      }),
+    );
+    renderWithClient(<AdminCalendar />);
+
+    expect(screen.getByTestId("admin-calendar-loading")).toBeInTheDocument();
+
+    release();
+
+    expect(
+      await screen.findByRole("button", { name: MEMBER_SLOT }),
+    ).toBeInTheDocument();
+  });
+
+  test("取得に失敗したら、エラーと再読み込みを出す", async () => {
+    server.use(
+      http.get("/api/facility", () => new HttpResponse(null, { status: 500 })),
+    );
+    renderWithClient(<AdminCalendar />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "施設情報を取得できませんでした。",
+    );
+  });
+});
+
 describe("表示", () => {
   test("今週を取り、予約済みの枠に予約者名を出す", async () => {
     renderCalendar();

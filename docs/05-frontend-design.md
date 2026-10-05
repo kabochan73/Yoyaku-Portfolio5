@@ -256,7 +256,7 @@ export async function POST(request: Request) {
 
 - クライアントの部品は `useFacility()` で施設情報を読む。トップでは `FacilityProvider` が静的シェルの値を `initialData` として渡す
 - ブラウザでは取り直さない（`staleTime: Infinity`）。ブラウザからの `/api/facility` は Laravel と DB まで届くので、訪問者の数だけ DB アクセスが増えるのを避ける
-- `FacilityProvider` の無いページ（管理画面）では、最初の1回だけ `/api/facility` を取る
+- `FacilityProvider` の無いページ（管理画面）では、最初の1回だけ `/api/facility` を取る。管理画面は料金・定休日を編集するので、再検証（worker の非同期処理）を待つ静的シェルの値ではなく、DB の最新の値を使う。届くまでは、カレンダーとほぼ同じ高さのスケルトンを出す
 - 料金・定休日の変更は、開いているタブにはリアルタイムで伝えない。予約の金額はサーバーが計算するので、見積もりが古くても保存される金額は正しい
 
 ## 週間カレンダー
