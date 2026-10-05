@@ -4,6 +4,7 @@ import {
   formatHourRange,
   formatShortDate,
   formatWeekRange,
+  formatWeekdays,
   formatYen,
 } from "@/lib/format";
 
@@ -37,4 +38,13 @@ test.each([
   [1234567, "¥1,234,567"],
 ])("formatYen(%i) は %s", (amount, expected) => {
   expect(formatYen(amount)).toBe(expected);
+});
+
+test.each([
+  [[1], "月曜日"],
+  [[0, 3, 1], "月曜日・水曜日・日曜日"],
+  [[6, 0], "土曜日・日曜日"],
+  [[], "なし"],
+])("formatWeekdays(%j) は %s", (days, expected) => {
+  expect(formatWeekdays(days)).toBe(expected);
 });

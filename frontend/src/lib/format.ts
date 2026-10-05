@@ -38,3 +38,14 @@ export function formatHourRange(startHour: number, endHour: number): string {
 export function formatYen(amount: number): string {
   return `¥${amount.toLocaleString("ja-JP")}`;
 }
+
+// 0（日）〜 6（土）を月曜始まりに並べる
+export function formatWeekdays(days: readonly number[]): string {
+  if (days.length === 0) {
+    return "なし";
+  }
+  return [...days]
+    .sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7))
+    .map((day) => `${WEEKDAYS[day] ?? ""}曜日`)
+    .join("・");
+}
