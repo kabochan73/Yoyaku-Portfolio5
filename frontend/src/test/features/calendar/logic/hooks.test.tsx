@@ -1,4 +1,4 @@
-import { QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import type { ReactNode } from "react";
@@ -117,4 +117,53 @@ test("次の週が予約できる範囲を超えるなら、先読みしない",
 
   expect(requestedWeeks).toEqual([]);
   expect(queryClient.isFetching()).toBe(0);
+});
+
+describe("取り直しのタイミング", () => {
+  const thisWeekRequests = () =>
+    requestedWeeks.filter((week) => week === THIS_WEEK);
+
+  beforeEach(() => {
+    jest.useFakeTimers({ advanceTimers: true });
+  });
+
+  afterEach(() => {
+    focusManager.setFocused(undefined);
+    jest.useRealTimers();
+  });
+
+  test("タブが裏にある間は、60秒たっても取り直さない", async () => {
+    focusManager.setFocused(false);
+    setup(THIS_WEEK, initialOf(THIS_WEEK));
+    await waitFor(() => expect(requestedWeeks).toEqual([NEXT_WEEK]));
+
+    await act(() => jest.advanceTimersByTimeAsync(180_000));
+
+    expect(thisWeekRequests()).toEqual([]);
+  });
+
+  test("30秒後に別の週へ行って戻っても、まだ新しいので取り直さない", async () => {
+    const { rerender } = setup(THIS_WEEK, initialOf(THIS_WEEK));
+    await waitFor(() => expect(requestedWeeks).toEqual([NEXT_WEEK]));
+    await act(() => jest.advanceTimersByTimeAsync(30_000));
+
+    rerender({ weekStart: NEXT_WEEK });
+    rerender({ weekStart: THIS_WEEK });
+    await act(() => jest.advanceTimersByTimeAsync(1_000));
+
+    expect(thisWeekRequests()).toEqual([]);
+  });
+
+  test("70秒後に戻ると、古くなっているので取り直す", async () => {
+    const { rerender } = setup(THIS_WEEK, initialOf(THIS_WEEK));
+    await waitFor(() => expect(requestedWeeks).toEqual([NEXT_WEEK]));
+    rerender({ weekStart: NEXT_WEEK });
+
+    await act(() => jest.advanceTimersByTimeAsync(70_000));
+    expect(thisWeekRequests()).toEqual([]);
+
+    rerender({ weekStart: THIS_WEEK });
+
+    await waitFor(() => expect(thisWeekRequests()).toEqual([THIS_WEEK]));
+  });
 });
