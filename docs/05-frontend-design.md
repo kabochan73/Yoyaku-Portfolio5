@@ -172,7 +172,7 @@ export const queryKeys = {
 
 | パス | 静的シェル | アクセスのたびに描画 |
 |---|---|---|
-| `/` | Header の枠・Hero・施設情報・利用規約・Footer・カレンダーのスケルトン | 今週のカレンダー |
+| `/` | Header の枠・Hero・施設情報・利用規約・Footer・カレンダーの週送り・案内と表のスケルトン | 今週のカレンダー |
 | `/login`, `/register` | 骨組み | ログイン済みかの確認 |
 | `/mypage` | 骨組み | ログイン確認とページの中身 |
 | `/admin` | 骨組み | ログイン確認とページの中身 |
@@ -193,7 +193,7 @@ export default async function Home() {
     <FacilityProvider facility={facility}>
       <Hero facility={facility} />
       <FacilityInfo facility={facility} />
-      <Suspense fallback={<CalendarSkeleton />}>
+      <Suspense fallback={<BookingCalendarPlaceholder rules={facility.rules} />}>
         <BookingCalendarSection />
       </Suspense>
       <RulesSection />

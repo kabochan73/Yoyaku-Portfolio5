@@ -31,7 +31,7 @@ export function SelectionHint({
     <p
       aria-live="polite"
       data-testid="selection-hint"
-      className="rounded-md bg-primary-soft px-4 py-2 text-sm text-green-800"
+      className="text-sm text-zinc-700"
     >
       {hintOf(selection, candidateCount, rules)}
     </p>

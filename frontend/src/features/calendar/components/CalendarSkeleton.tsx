@@ -1,8 +1,10 @@
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CalendarGrid } from "./CalendarGrid";
 
-// 静的シェルでは今日が分からないので、日付の代わりに曜日だけを出す
-const WEEKDAY_HEADINGS = ["月", "火", "水", "木", "金", "土", "日"];
+// 週が分からないので、見出しの曜日・日付もスケルトンにする
+const HEADINGS = Array.from({ length: 7 }, (_, i) => (
+  <Skeleton key={i} className="mx-auto h-12 w-8" />
+));
 
 export function CalendarSkeleton({
   openHour,
@@ -12,13 +14,12 @@ export function CalendarSkeleton({
   closeHour: number;
 }) {
   return (
-    <div className="space-y-4" data-testid="calendar-skeleton">
-      <Skeleton className="h-8 w-full" />
+    <div data-testid="calendar-skeleton">
       <CalendarGrid
-        headings={WEEKDAY_HEADINGS}
+        headings={HEADINGS}
         openHour={openHour}
         closeHour={closeHour}
-        renderCell={() => <Skeleton className="h-9 w-full" />}
+        renderCell={() => <Skeleton className="h-6 w-full" />}
       />
     </div>
   );

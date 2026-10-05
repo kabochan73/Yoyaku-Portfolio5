@@ -3,8 +3,8 @@ import {
   formatHour,
   formatHourRange,
   formatMonthDayJa,
-  formatShortDate,
   formatWeekRange,
+  formatWeekdayShort,
   formatWeekdays,
   formatYen,
 } from "@/lib/format";
@@ -17,8 +17,8 @@ test("formatDateJa は曜日付きの長い日付", () => {
   expect(formatDateJa("2026-10-06")).toBe("2026年10月6日（火）");
 });
 
-test("formatShortDate は曜日付きの短い日付", () => {
-  expect(formatShortDate("2026-10-11")).toBe("10/11（日）");
+test("formatWeekdayShort は曜日1文字", () => {
+  expect(formatWeekdayShort("2026-10-11")).toBe("日");
 });
 
 test("formatWeekRange は月曜から日曜まで", () => {

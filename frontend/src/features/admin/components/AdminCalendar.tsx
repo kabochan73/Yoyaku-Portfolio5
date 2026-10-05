@@ -59,8 +59,8 @@ export function AdminCalendar() {
     return (
       <div className="space-y-4" data-testid="admin-calendar-loading">
         <Skeleton className="h-8 w-full" />
-        <Skeleton className="h-9 w-full" />
-        <Skeleton className="h-[37rem] w-full" />
+        <Skeleton className="h-5 w-64" />
+        <Skeleton className="h-[33rem] w-full" />
       </div>
     );
   }
@@ -119,6 +119,7 @@ export function AdminCalendar() {
               <DayHeading
                 key={date}
                 date={date}
+                today={data.meta.today}
                 closedReason={
                   switching ? null : data.data[column]?.closed_reason
                 }

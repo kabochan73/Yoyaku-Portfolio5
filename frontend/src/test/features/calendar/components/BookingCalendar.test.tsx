@@ -159,12 +159,14 @@ describe("枠の表示", () => {
     expect(slot("10月5日（月） 10:00 〜 11:00 受付外")).toBeDisabled();
   });
 
-  test("見出しに日付と、受付外の日の理由を出す", () => {
+  test("見出しに曜日と日付、今日の印、受付外の日の理由を出す", () => {
     renderCalendar(initialOf());
 
     const headings = screen.getAllByRole("columnheader");
-    expect(headings[1]).toHaveTextContent("10/5（月）定休日");
-    expect(headings[2]).toHaveTextContent("10/6（火）");
+    expect(headings[0]).toHaveTextContent("時間");
+    expect(headings[1]).toHaveTextContent("月5（今日）定休日");
+    expect(headings[2]).toHaveTextContent("火6");
+    expect(headings[2]).not.toHaveTextContent("今日");
   });
 
   test("営業時間の分だけ行がある（10時〜21時の12行）", () => {
@@ -172,8 +174,8 @@ describe("枠の表示", () => {
 
     const rows = screen.getAllByRole("rowheader");
     expect(rows).toHaveLength(12);
-    expect(rows[0]).toHaveTextContent("10:00〜11:00");
-    expect(rows[11]).toHaveTextContent("21:00〜22:00");
+    expect(rows[0]).toHaveTextContent("10:00 〜 11:00");
+    expect(rows[11]).toHaveTextContent("21:00 〜 22:00");
   });
 });
 
@@ -234,7 +236,7 @@ describe("週送り", () => {
     const table = screen.getByRole("table");
     expect(table).toHaveAttribute("data-dimmed", "true");
     expect(within(table).getAllByRole("columnheader")[1]).toHaveTextContent(
-      "10/19（月）",
+      "月19",
     );
     expect(
       within(table)

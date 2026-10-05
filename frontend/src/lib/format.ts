@@ -21,9 +21,8 @@ export function formatMonthDayJa(date: string): string {
   return `${month}月${day}日（${weekdayOf(date)}）`;
 }
 
-export function formatShortDate(date: string): string {
-  const { month, day } = parts(date);
-  return `${month}/${day}（${weekdayOf(date)}）`;
+export function formatWeekdayShort(date: string): string {
+  return weekdayOf(date);
 }
 
 export function formatWeekRange(monday: string): string {

@@ -26,13 +26,13 @@ export function BookedSlotCell({
       disabled={disabled}
       onClick={onOpen}
       aria-label={`${formatMonthDayJa(date)} ${formatHourRange(hour, hour + 1)} ${name} さんの予約${reservation.is_phone ? "（電話）" : ""}`}
-      className={`flex h-9 w-full items-center justify-center overflow-hidden rounded px-1 text-xs font-medium text-zinc-800 hover:brightness-95 disabled:cursor-not-allowed sm:text-sm ${closedDay ? "bg-zinc-200" : "bg-amber-100"}`}
+      className={`w-full overflow-hidden rounded-md px-1 py-1 text-xs font-semibold transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-default sm:px-2 ${closedDay ? "bg-zinc-100 text-zinc-500" : "bg-danger-soft text-danger-muted"}`}
     >
-      <span className="hidden truncate sm:inline">
+      <span className="hidden truncate sm:block">
         {mark}
         {name}
       </span>
-      <span className="truncate sm:hidden">
+      <span className="block truncate sm:hidden">
         {mark}
         {short}
       </span>

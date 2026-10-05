@@ -110,6 +110,7 @@ export function BookingCalendar({
               <DayHeading
                 key={date}
                 date={date}
+                today={data.meta.today}
                 closedReason={
                   switching ? null : data.data[column]?.closed_reason
                 }

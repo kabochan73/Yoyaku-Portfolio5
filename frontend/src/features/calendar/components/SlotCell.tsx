@@ -10,26 +10,25 @@ const LOOKS: Record<
     wide: "空き",
     narrow: "空",
     spoken: "空き",
-    className:
-      "border border-primary/30 bg-white text-primary hover:bg-primary-soft",
+    className: "bg-white text-primary-hover hover:bg-primary-soft",
   },
   booked: {
     wide: "予約済",
     narrow: "✕",
     spoken: "予約済み",
-    className: "bg-zinc-100 text-zinc-400",
+    className: "bg-danger-soft text-danger-muted",
   },
   past: {
     wide: "－",
     narrow: "－",
     spoken: "受付終了",
-    className: "text-zinc-300",
+    className: "bg-zinc-100 text-zinc-400",
   },
   closed: {
     wide: "－",
     narrow: "－",
     spoken: "受付外",
-    className: "text-zinc-300",
+    className: "bg-zinc-100 text-zinc-400",
   },
 };
 
@@ -50,7 +49,7 @@ const MARKS: Record<
     spoken: "終了候補",
     chosen: false,
     className:
-      "border-2 border-primary bg-primary-soft text-primary hover:bg-green-100",
+      "bg-primary-muted text-primary-hover ring-1 ring-primary-ring hover:brightness-95",
   },
   selected: {
     wide: "選択中",
@@ -88,7 +87,7 @@ export function SlotCell({
       onClick={onSelect}
       aria-label={`${formatMonthDayJa(date)} ${formatHourRange(hour, hour + 1)} ${spoken}`}
       aria-pressed={marked?.chosen || undefined}
-      className={`flex h-9 w-full items-center justify-center rounded text-xs font-medium disabled:cursor-not-allowed sm:text-sm ${marked?.className ?? look.className}`}
+      className={`w-full rounded-md px-1 py-1 text-xs font-semibold transition focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none disabled:cursor-default sm:px-2 ${marked?.className ?? look.className}`}
     >
       <span className="hidden sm:inline">{marked?.wide ?? look.wide}</span>
       <span className="sm:hidden">{look.narrow}</span>

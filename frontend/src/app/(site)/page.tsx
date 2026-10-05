@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { BookingCalendar } from "@/features/calendar/components/BookingCalendar";
-import { CalendarSkeleton } from "@/features/calendar/components/CalendarSkeleton";
+import { BookingCalendarPlaceholder } from "@/features/calendar/components/BookingCalendarPlaceholder";
 import { getCalendar } from "@/features/calendar/logic/server";
 import { FacilityInfo } from "@/features/facility/components/FacilityInfo";
 import { FacilityProvider } from "@/features/facility/components/FacilityProvider";
@@ -15,15 +15,10 @@ export default async function Home() {
     <FacilityProvider facility={facility}>
       <Hero facility={facility} />
       <FacilityInfo facility={facility} />
-      <section id="calendar" className="bg-zinc-50 py-12">
+      <section id="calendar" className="bg-zinc-50 py-8">
         <div className="mx-auto max-w-5xl px-4">
           <Suspense
-            fallback={
-              <CalendarSkeleton
-                openHour={facility.rules.open_hour}
-                closeHour={facility.rules.close_hour}
-              />
-            }
+            fallback={<BookingCalendarPlaceholder rules={facility.rules} />}
           >
             <BookingCalendarSection />
           </Suspense>

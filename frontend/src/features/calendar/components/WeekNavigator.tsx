@@ -8,11 +8,12 @@ export function WeekNavigator({
   onPrev,
   onNext,
 }: {
-  weekStart: string;
+  // 読み込み中で週が分からないときは null。範囲を空欄にする
+  weekStart: string | null;
   canPrev: boolean;
   canNext: boolean;
-  onPrev: () => void;
-  onNext: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
@@ -24,8 +25,11 @@ export function WeekNavigator({
       >
         ← 前の週
       </Button>
-      <p className="font-medium" aria-live="polite">
-        {formatWeekRange(weekStart)}
+      <p
+        className="text-lg font-medium text-zinc-800 sm:text-xl"
+        aria-live="polite"
+      >
+        {weekStart === null ? "\u00a0" : formatWeekRange(weekStart)}
       </p>
       <Button
         variant="secondary"

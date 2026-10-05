@@ -95,7 +95,7 @@ page.tsx
 └── FacilityProvider
     ├── Hero                       施設名・キャッチコピー・電話・住所・メール
     ├── FacilityInfo               営業時間・料金・定休日・利用時間・貸し出し・支払い
-    ├── Suspense（CalendarSkeleton）
+    ├── Suspense（BookingCalendarPlaceholder）
     │   └── BookingCalendar
     │       ├── WeekNavigator
     │       ├── SelectionHint
@@ -111,7 +111,7 @@ page.tsx
 
 | 状態 | 表示 |
 |---|---|
-| サーバーで今週を取っている間 | `CalendarSkeleton`（曜日・時刻の見出しと、スケルトンのセル） |
+| サーバーで今週を取っている間 | 週送り（範囲は空欄、ボタンは押せない）と案内は本物と同じ形で出し、表だけスケルトン（`CalendarSkeleton`） |
 | 今週を表示 | サーバーで取った最新の空き状況 |
 | 週送り中 | 前の週のセルを出したまま薄くする。見出しの日付は新しい週に変える |
 | 取得の失敗 | グリッドの代わりに「空き状況を取得できませんでした」+「再読み込み」 |
