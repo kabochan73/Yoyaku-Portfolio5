@@ -12,6 +12,10 @@ import { server } from "@/test/msw/server";
 import { renderWithClient } from "@/test/render";
 import facilityFixture from "@/test/fixtures/facility.json";
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
 const facility = facilityFixture.data as Facility;
 const THIS_WEEK = "2026-10-05";
 const NEXT_WEEK = "2026-10-12";
@@ -76,6 +80,18 @@ function slot(name: string) {
 beforeEach(() => {
   requestedWeeks = [];
   respondCalendar();
+  server.use(
+    http.get("/api/user", () =>
+      HttpResponse.json({
+        data: {
+          id: 1,
+          name: "山田太郎",
+          email: "taro@example.com",
+          role: "user",
+        },
+      }),
+    ),
+  );
 });
 
 describe("最初の表示", () => {
@@ -344,5 +360,89 @@ describe("枠の選択", () => {
     expect(hint()).toHaveTextContent(
       "この時間からは2時間以上続けて空いていません",
     );
+  });
+});
+
+describe("予約", () => {
+  const WED = "10月7日（水）";
+
+  async function chooseTwoHours() {
+    await userEvent.click(slot(`${WED} 12:00 〜 13:00 空き`));
+    await userEvent.click(slot(`${WED} 13:00 〜 14:00 空き（終了候補）`));
+  }
+
+  async function reserve() {
+    const button = await screen.findByRole("button", { name: "予約する" });
+    await waitFor(() => expect(button).toBeEnabled());
+    await userEvent.click(button);
+  }
+
+  test("枠を2回選ぶと、確認ダイアログに日付・時間・料金が出る", async () => {
+    renderCalendar(initialOf());
+
+    await chooseTwoHours();
+
+    const dialog = screen.getByRole("dialog", { name: "予約内容の確認" });
+    expect(dialog).toHaveTextContent("2026年10月7日（水）");
+    expect(dialog).toHaveTextContent("12:00 〜 14:00");
+    expect(dialog).toHaveTextContent("¥8,000");
+  });
+
+  test("戻るで閉じると、選択を解除する", async () => {
+    renderCalendar(initialOf());
+    await chooseTwoHours();
+
+    await userEvent.click(screen.getByRole("button", { name: "戻る" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByTestId("selection-hint")).toHaveTextContent(
+      "開始時刻の枠を選んでください",
+    );
+  });
+
+  test("予約できたら、カレンダーを取り直し、成功のメッセージにフォーカスを移す", async () => {
+    let sent: unknown;
+    server.use(
+      http.post("/api/reservations", async ({ request }) => {
+        sent = await request.json();
+        return HttpResponse.json({ data: { id: 1 } }, { status: 201 });
+      }),
+    );
+    renderCalendar(initialOf());
+    await chooseTwoHours();
+
+    await reserve();
+
+    const message = await screen.findByText(
+      /予約しました。確認メールをお送りしました。/,
+    );
+    expect(sent).toEqual({ date: "2026-10-07", start_hour: 12, end_hour: 14 });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await waitFor(() => expect(requestedWeeks).toContain(THIS_WEEK));
+    expect(message.closest("[tabindex]")).toHaveFocus();
+
+    await userEvent.click(slot(`${WED} 16:00 〜 17:00 空き`));
+    expect(screen.queryByText(/予約しました。/)).not.toBeInTheDocument();
+  });
+
+  test("先に予約されたら、ダイアログにエラーを出し、カレンダーを取り直す", async () => {
+    server.use(
+      http.post("/api/reservations", () =>
+        HttpResponse.json(
+          { message: "その時間帯は先に予約されました。", code: "slot_taken" },
+          { status: 409 },
+        ),
+      ),
+    );
+    renderCalendar(initialOf());
+    await chooseTwoHours();
+
+    await reserve();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "その時間帯は先に予約されました。",
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await waitFor(() => expect(requestedWeeks).toContain(THIS_WEEK));
   });
 });

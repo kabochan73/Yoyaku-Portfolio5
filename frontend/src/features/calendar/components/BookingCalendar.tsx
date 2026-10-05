@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { Alert } from "@/components/ui/Alert";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useFacility } from "@/features/facility/logic/hooks";
+import { ReservationConfirmDialog } from "@/features/reservations/components/ReservationConfirmDialog";
 import { addDays, mondayOf, todayInTokyo } from "@/lib/date";
 import { useCalendar } from "../logic/hooks";
 import {
@@ -50,7 +53,16 @@ export function BookingCalendar({
   );
   const [weekStart, setWeekStart] = useState(thisWeek);
   const [selection, setSelection] = useState<Selection>(IDLE);
+  const [reserved, setReserved] = useState(false);
+  const reservedRef = useRef<HTMLDivElement>(null);
   const calendar = useCalendar(weekStart, initialCalendar);
+
+  // 予約した枠は押せなくなり、ダイアログを開いたボタンへフォーカスを戻せないので、成功のメッセージへ移す
+  useEffect(() => {
+    if (reserved) {
+      reservedRef.current?.focus();
+    }
+  }, [reserved]);
 
   if (!facility) {
     return null;
@@ -75,9 +87,14 @@ export function BookingCalendar({
           ?.slots.find((slot) => slot.hour === hour)?.status;
   const candidates = endCandidates(selection, getStatus, rules);
 
+  const changeSelection = (next: Selection) => {
+    setSelection(next);
+    setReserved(false);
+  };
+
   const changeWeek = (week: string) => {
     setWeekStart(week);
-    setSelection(IDLE);
+    changeSelection(IDLE);
   };
 
   return (
@@ -89,6 +106,16 @@ export function BookingCalendar({
         onPrev={() => changeWeek(addDays(weekStart, -7))}
         onNext={() => changeWeek(nextWeek)}
       />
+      {reserved && (
+        <div ref={reservedRef} tabIndex={-1} className="outline-none">
+          <Alert tone="success">
+            予約しました。確認メールをお送りしました。{" "}
+            <Link href="/mypage" className="underline">
+              マイページで確認
+            </Link>
+          </Alert>
+        </div>
+      )}
       <SelectionHint
         selection={selection}
         candidateCount={candidates.length}
@@ -122,7 +149,7 @@ export function BookingCalendar({
                 mark={markOf(selection, candidates, date, hour)}
                 disabled={switching}
                 onSelect={() =>
-                  setSelection(
+                  changeSelection(
                     selectSlot(selection, { date, hour }, getStatus, rules),
                   )
                 }
@@ -138,6 +165,22 @@ export function BookingCalendar({
       ) : (
         <CalendarSkeleton openHour={openHour} closeHour={closeHour} />
       )}
+      <ReservationConfirmDialog
+        slot={
+          selection.kind === "complete"
+            ? {
+                date: selection.date,
+                start_hour: selection.startHour,
+                end_hour: selection.endHour,
+              }
+            : null
+        }
+        onClose={() => setSelection(IDLE)}
+        onReserved={() => {
+          setSelection(IDLE);
+          setReserved(true);
+        }}
+      />
     </div>
   );
 }
