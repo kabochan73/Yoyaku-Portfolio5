@@ -356,13 +356,13 @@ React に依存しないので、境界値（2時間ちょうど、4時間ちょ
 
 ### サーバー側での保護
 
-ログイン確認は `cookies()` を読むので、レイアウトの一番上ではなく `<Suspense>` の中の部品で行う。
+ログイン確認は `cookies()` を読むので、レイアウトの一番上ではなく `<Suspense>` の中の部品で行う。確認はすぐ終わり、ページ側にそれぞれの読み込み中の表示があるので、`fallback` は出さない（出すと、ページのスケルトンと二重になる）。
 
 ```tsx
 // app/admin/layout.tsx
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense>
       <RequireUser role="admin">{children}</RequireUser>
     </Suspense>
   );
