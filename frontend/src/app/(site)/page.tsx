@@ -15,18 +15,19 @@ export default async function Home() {
     <FacilityProvider facility={facility}>
       <Hero facility={facility} />
       <FacilityInfo facility={facility} />
-      <section id="calendar" className="mx-auto max-w-5xl px-4 py-10">
-        <h2 className="mb-4 text-xl font-bold">空き状況・ご予約</h2>
-        <Suspense
-          fallback={
-            <CalendarSkeleton
-              openHour={facility.rules.open_hour}
-              closeHour={facility.rules.close_hour}
-            />
-          }
-        >
-          <BookingCalendarSection />
-        </Suspense>
+      <section id="calendar" className="bg-zinc-50 py-12">
+        <div className="mx-auto max-w-5xl px-4">
+          <Suspense
+            fallback={
+              <CalendarSkeleton
+                openHour={facility.rules.open_hour}
+                closeHour={facility.rules.close_hour}
+              />
+            }
+          >
+            <BookingCalendarSection />
+          </Suspense>
+        </div>
       </section>
       <RulesSection />
     </FacilityProvider>

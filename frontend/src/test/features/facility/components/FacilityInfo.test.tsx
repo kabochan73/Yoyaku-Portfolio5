@@ -13,12 +13,11 @@ test("施設情報の値から、案内の各項目を作る", () => {
   render(<FacilityInfo facility={facility} />);
 
   expect(valueOf("営業時間")).toBe("10:00 〜 22:00");
-  expect(valueOf("料金")).toBe(
-    "平日 ¥4,000 / 土日 ¥5,000（1時間あたり、祝日は平日料金）",
-  );
-  expect(valueOf("定休日")).toBe("毎週 月曜日");
-  expect(valueOf("利用時間")).toBe("2〜4時間（1時間単位）");
-  expect(valueOf("予約受付")).toBe("1か月先まで");
+  expect(valueOf("料金（1時間）")).toBe("平日 ¥4,000・土日 ¥5,000");
+  expect(valueOf("定休日")).toBe("月曜日");
+  expect(valueOf("利用時間(相談可)")).toBe("2〜4時間");
+  expect(valueOf("レンタル")).toBe("ボール・ビブス無料");
+  expect(valueOf("支払い方法")).toBe("現地払い現金のみ");
 });
 
 test("料金・定休日・ルールが変われば、表示も変わる", () => {
@@ -34,9 +33,9 @@ test("料金・定休日・ルールが変われば、表示も変わる", () =>
   );
 
   expect(valueOf("営業時間")).toBe("09:00 〜 22:00");
-  expect(valueOf("料金")).toContain("平日 ¥4,500 / 土日 ¥6,000");
-  expect(valueOf("定休日")).toBe("毎週 火曜日・日曜日");
-  expect(valueOf("利用時間")).toBe("2〜3時間（1時間単位）");
+  expect(valueOf("料金（1時間）")).toBe("平日 ¥4,500・土日 ¥6,000");
+  expect(valueOf("定休日")).toBe("火曜日・日曜日");
+  expect(valueOf("利用時間(相談可)")).toBe("2〜3時間");
 });
 
 test("定休日が無ければ「なし」", () => {
