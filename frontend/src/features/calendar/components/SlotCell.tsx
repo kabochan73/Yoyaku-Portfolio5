@@ -32,30 +32,66 @@ const LOOKS: Record<
   },
 };
 
+export type SlotMark = "start" | "candidate" | "selected";
+
+const CHOSEN_CLASS_NAME = "bg-primary text-white hover:bg-primary-hover";
+
+const MARKS: Record<
+  SlotMark,
+  { wide: string; spoken: string; chosen: boolean; className: string }
+> = {
+  start: {
+    wide: "開始",
+    spoken: "開始",
+    chosen: true,
+    className: CHOSEN_CLASS_NAME,
+  },
+  candidate: {
+    wide: "空き",
+    spoken: "終了候補",
+    chosen: false,
+    className:
+      "border-2 border-primary bg-primary-soft text-primary hover:bg-green-100",
+  },
+  selected: {
+    wide: "選択中",
+    spoken: "選択中",
+    chosen: true,
+    className: CHOSEN_CLASS_NAME,
+  },
+};
+
 export function SlotCell({
   date,
   hour,
   status,
+  mark,
   disabled = false,
   onSelect,
 }: {
   date: string;
   hour: number;
   status: SlotStatus;
+  mark?: SlotMark;
   disabled?: boolean;
   onSelect?: () => void;
 }) {
   const look = LOOKS[status];
+  // 取り直しで予約済みに変わった枠には、選択の印を付けない
+  const marked =
+    mark !== undefined && status === "available" ? MARKS[mark] : null;
+  const spoken = marked ? `${look.spoken}（${marked.spoken}）` : look.spoken;
 
   return (
     <button
       type="button"
       disabled={disabled || status !== "available"}
       onClick={onSelect}
-      aria-label={`${formatMonthDayJa(date)} ${formatHourRange(hour, hour + 1)} ${look.spoken}`}
-      className={`flex h-9 w-full items-center justify-center rounded text-xs font-medium disabled:cursor-not-allowed sm:text-sm ${look.className}`}
+      aria-label={`${formatMonthDayJa(date)} ${formatHourRange(hour, hour + 1)} ${spoken}`}
+      aria-pressed={marked?.chosen || undefined}
+      className={`flex h-9 w-full items-center justify-center rounded text-xs font-medium disabled:cursor-not-allowed sm:text-sm ${marked?.className ?? look.className}`}
     >
-      <span className="hidden sm:inline">{look.wide}</span>
+      <span className="hidden sm:inline">{marked?.wide ?? look.wide}</span>
       <span className="sm:hidden">{look.narrow}</span>
     </button>
   );

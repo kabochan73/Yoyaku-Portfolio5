@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { BookingCalendar } from "@/features/calendar/components/BookingCalendar";
@@ -7,6 +7,7 @@ import type { Calendar, SlotStatus } from "@/features/calendar/logic/types";
 import { FacilityProvider } from "@/features/facility/components/FacilityProvider";
 import type { Facility } from "@/features/facility/logic/types";
 import { addDays } from "@/lib/date";
+import { queryKeys } from "@/lib/query-keys";
 import { server } from "@/test/msw/server";
 import { renderWithClient } from "@/test/render";
 import facilityFixture from "@/test/fixtures/facility.json";
@@ -228,6 +229,120 @@ describe("週送り", () => {
     release();
     await waitFor(() =>
       expect(screen.getByRole("table")).toHaveAttribute("data-dimmed", "false"),
+    );
+  });
+});
+
+describe("枠の選択", () => {
+  const WED = "10月7日（水）";
+
+  function hint() {
+    return screen.getByTestId("selection-hint");
+  }
+
+  async function press(hour: number, spoken = "空き") {
+    await userEvent.click(
+      slot(`${WED} ${hour}:00 〜 ${hour + 1}:00 ${spoken}`),
+    );
+  }
+
+  test("最初は、開始の枠を選ぶよう案内する", () => {
+    renderCalendar(initialOf());
+
+    expect(hint()).toHaveTextContent(
+      "開始時刻の枠を選んでください（2〜4時間）",
+    );
+  });
+
+  test("開始を選ぶと、2〜4枠目が終了候補になり、案内が変わる", async () => {
+    renderCalendar(initialOf());
+
+    await press(12);
+
+    expect(slot(`${WED} 12:00 〜 13:00 空き（開始）`)).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(slot(`${WED} 13:00 〜 14:00 空き（終了候補）`)).toBeEnabled();
+    expect(slot(`${WED} 15:00 〜 16:00 空き（終了候補）`)).toBeEnabled();
+    expect(slot(`${WED} 16:00 〜 17:00 空き`)).toBeEnabled();
+    expect(hint()).toHaveTextContent(
+      "終了時刻の枠を選んでください。12:00から2〜4時間まで選べます",
+    );
+  });
+
+  test("終了候補を押すと、開始からその枠までが選ばれる", async () => {
+    renderCalendar(initialOf());
+
+    await press(12);
+    await press(14, "空き（終了候補）");
+
+    expect(
+      screen.getAllByRole("button", { name: /空き（選択中）$/ }),
+    ).toHaveLength(3);
+    expect(hint()).toHaveTextContent(
+      "10月7日（水） 12:00 〜 15:00（3時間）を選びました",
+    );
+  });
+
+  test("開始をもう一度押すと、選択を解除する", async () => {
+    renderCalendar(initialOf());
+
+    await press(12);
+    await press(12, "空き（開始）");
+
+    expect(screen.queryAllByRole("button", { pressed: true })).toHaveLength(0);
+    expect(hint()).toHaveTextContent("開始時刻の枠を選んでください");
+  });
+
+  test("週を変えると、選択を解除する", async () => {
+    renderCalendar(initialOf());
+    await press(12);
+
+    await userEvent.click(screen.getByRole("button", { name: "次の週 →" }));
+    await userEvent.click(screen.getByRole("button", { name: "← 前の週" }));
+
+    expect(hint()).toHaveTextContent("開始時刻の枠を選んでください");
+    expect(slot(`${WED} 12:00 〜 13:00 空き`)).not.toHaveAttribute(
+      "aria-pressed",
+    );
+  });
+
+  test("閉店間際で続けて空いていなければ、別の枠を選ぶよう案内する", async () => {
+    renderCalendar(initialOf());
+
+    await press(21);
+
+    expect(hint()).toHaveTextContent(
+      "この時間からは2時間以上続けて空いていません。別の枠を選んでください",
+    );
+  });
+
+  test("取り直しで開始の枠が予約済みに変わると、終了候補が消え、案内が変わる", async () => {
+    const { queryClient } = renderCalendar(initialOf());
+    await press(12);
+
+    const updated = calendarOf(THIS_WEEK);
+    const wednesday = updated.data[2];
+    if (wednesday) {
+      wednesday.slots = wednesday.slots.map((s) =>
+        s.hour === 12 ? { ...s, status: "booked" } : s,
+      );
+    }
+    act(() => {
+      queryClient.setQueryData(queryKeys.calendar.week(THIS_WEEK), updated);
+    });
+
+    expect(
+      await screen.findByRole("button", {
+        name: `${WED} 12:00 〜 13:00 予約済み`,
+      }),
+    ).toBeDisabled();
+    expect(screen.queryAllByRole("button", { name: /終了候補/ })).toHaveLength(
+      0,
+    );
+    expect(hint()).toHaveTextContent(
+      "この時間からは2時間以上続けて空いていません",
     );
   });
 });

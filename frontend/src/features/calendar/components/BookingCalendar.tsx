@@ -5,11 +5,39 @@ import { ErrorState } from "@/components/ui/ErrorState";
 import { useFacility } from "@/features/facility/logic/hooks";
 import { addDays, mondayOf, todayInTokyo } from "@/lib/date";
 import { useCalendar } from "../logic/hooks";
+import {
+  endCandidates,
+  IDLE,
+  selectSlot,
+  type GetStatus,
+  type Selection,
+} from "../logic/selection";
 import type { InitialCalendar } from "../logic/server";
 import { CalendarGrid, DayHeading } from "./CalendarGrid";
 import { CalendarSkeleton } from "./CalendarSkeleton";
-import { SlotCell } from "./SlotCell";
+import { SelectionHint } from "./SelectionHint";
+import { SlotCell, type SlotMark } from "./SlotCell";
 import { WeekNavigator } from "./WeekNavigator";
+
+function markOf(
+  selection: Selection,
+  candidates: number[],
+  date: string,
+  hour: number,
+): SlotMark | undefined {
+  if (selection.kind === "idle" || selection.date !== date) {
+    return undefined;
+  }
+  if (selection.kind === "start") {
+    if (hour === selection.hour) {
+      return "start";
+    }
+    return candidates.includes(hour) ? "candidate" : undefined;
+  }
+  return hour >= selection.startHour && hour < selection.endHour
+    ? "selected"
+    : undefined;
+}
 
 export function BookingCalendar({
   initialCalendar,
@@ -21,6 +49,7 @@ export function BookingCalendar({
     () => initialCalendar?.weekStart ?? mondayOf(todayInTokyo()),
   );
   const [weekStart, setWeekStart] = useState(thisWeek);
+  const [selection, setSelection] = useState<Selection>(IDLE);
   const calendar = useCalendar(weekStart, initialCalendar);
 
   if (!facility) {
@@ -33,6 +62,23 @@ export function BookingCalendar({
   const bookableUntil = data?.meta.bookable_until;
   // 週の切り替え中は前の週の枠を出したままにするので、押させない
   const switching = calendar.isPlaceholderData;
+  const rules = {
+    minHours: facility.rules.min_hours,
+    maxHours: facility.rules.max_hours,
+  };
+  // 取り直しで枠の状態が変わっても、選択は毎回最新のデータで判定し直す
+  const getStatus: GetStatus = (date, hour) =>
+    switching
+      ? undefined
+      : data?.data
+          .find((day) => day.date === date)
+          ?.slots.find((slot) => slot.hour === hour)?.status;
+  const candidates = endCandidates(selection, getStatus, rules);
+
+  const changeWeek = (week: string) => {
+    setWeekStart(week);
+    setSelection(IDLE);
+  };
 
   return (
     <div className="space-y-4">
@@ -40,8 +86,13 @@ export function BookingCalendar({
         weekStart={weekStart}
         canPrev={weekStart > thisWeek}
         canNext={bookableUntil !== undefined && nextWeek <= bookableUntil}
-        onPrev={() => setWeekStart(addDays(weekStart, -7))}
-        onNext={() => setWeekStart(nextWeek)}
+        onPrev={() => changeWeek(addDays(weekStart, -7))}
+        onNext={() => changeWeek(nextWeek)}
+      />
+      <SelectionHint
+        selection={selection}
+        candidateCount={candidates.length}
+        rules={rules}
       />
       {data ? (
         <CalendarGrid
@@ -61,14 +112,20 @@ export function BookingCalendar({
           closeHour={closeHour}
           dimmed={switching}
           renderCell={(column, hour) => {
-            const day = data.data[column];
-            const slot = day?.slots.find((s) => s.hour === hour);
+            const date = addDays(weekStart, column);
+            const slot = data.data[column]?.slots.find((s) => s.hour === hour);
             return (
               <SlotCell
-                date={addDays(weekStart, column)}
+                date={date}
                 hour={hour}
                 status={slot?.status ?? "closed"}
+                mark={markOf(selection, candidates, date, hour)}
                 disabled={switching}
+                onSelect={() =>
+                  setSelection(
+                    selectSlot(selection, { date, hour }, getStatus, rules),
+                  )
+                }
               />
             );
           }}
