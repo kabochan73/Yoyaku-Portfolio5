@@ -120,7 +120,8 @@ frontend のビルド ──https──▶ backend の公開 URL /api/facility
 
 ### frontend のイメージ
 
-- `API_URL` と `BUILD_API_URL` を Dockerfile の `ARG` で受け取る（Railway の変数をビルド時に使うには `ARG` が必要）
+- `API_URL`・`BUILD_API_URL`・`FRONTEND_URL`・`REVALIDATE_SECRET` を Dockerfile の `ARG` で受け取る（Railway の変数をビルド時に使うには `ARG` が必要。`next build` が `lib/env.ts` で4つとも確かめる）
+- 実行用のイメージには、standalone の出力に加えて `public/` と `.next/static` をコピーする（`server.js` はこの2つを含まない）
 - `API_URL` は rewrites に焼き込まれるのでビルド時にも要る。ビルド中は届かなくてよい
 - `BUILD_API_URL` はビルド中に実際に呼ぶので、backend の公開 URL にする
 
