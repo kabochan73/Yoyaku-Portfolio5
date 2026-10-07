@@ -80,8 +80,13 @@ jobs:
       run:
         working-directory: frontend
         shell: bash
+    # next typegen と next build が next.config.ts を読むので、ジョブ全体に渡す
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      API_URL: http://127.0.0.1:4010/api
+      BUILD_API_URL: http://127.0.0.1:4010/api
+      FRONTEND_URL: http://localhost:3000
+      REVALIDATE_SECRET: ci-secret
     steps:
       - uses: actions/checkout@v4
 
@@ -107,11 +112,6 @@ jobs:
 
       # 施設情報は静的シェルに入るので、ビルドの中で /api/facility を取る。CI にはバックエンドが無いのでスタブで返す
       - name: Build
-        env:
-          API_URL: http://127.0.0.1:4010/api
-          BUILD_API_URL: http://127.0.0.1:4010/api
-          FRONTEND_URL: http://localhost:3000
-          REVALIDATE_SECRET: ci-secret
         run: |
           node scripts/build-stub-server.mjs &
           for _ in $(seq 1 20); do
