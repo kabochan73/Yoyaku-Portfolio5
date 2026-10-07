@@ -114,8 +114,9 @@ frontend のビルド ──https──▶ backend の公開 URL /api/facility
 - 起動時に `php artisan optimize`（config・route・view・event のキャッシュ）を流す。serversideup の AUTORUN（`AUTORUN_ENABLED=true`）を使い、AUTORUN のマイグレーションと `storage:link` は止める
 - `APP_LOCALE`・`DB_CONNECTION` などは、渡し忘れても動くよう `config/` の既定値をこのアプリの値（`ja`・`pgsql`）にしておく
 - ヘルスチェックは Laravel 標準の `/up`
-- マイグレーションは backend サービスの pre-deploy command で流す: `php artisan migrate --force`。worker・scheduler では流さない
-- シーダーなど一度きりの作業は、Railway のワンオフコマンドで流す
+- マイグレーションと初期データは backend サービスの pre-deploy command で流す: `sh -c "php artisan migrate --force && php artisan db:seed --class=InitialDataSeeder --force"`（Railway はシェルを通さずに実行するので、`&&` を使うには `sh -c` で包む）。worker・scheduler では流さない
+- `InitialDataSeeder` は、管理者・料金がすでにあれば何もしないので、毎回流しても管理画面で変えた料金を上書きしない
+- Start Command は空のままにする（イメージの既定の起動処理で nginx と PHP-FPM が立ち上がる）。ここにマイグレーションを入れると、アプリが起動しない
 - `btree_gist` 拡張はマイグレーションで有効にする
 
 ### frontend のイメージ
@@ -130,12 +131,11 @@ frontend のビルド ──https──▶ backend の公開 URL /api/facility
 frontend のビルドが backend の `/api/facility` を必要とするので、初回だけ順番に行う。
 
 1. postgres・redis を作る
-2. backend を作り、変数を入れてデプロイする（pre-deploy でマイグレーション）
-3. ワンオフコマンドで `php artisan db:seed --class=InitialDataSeeder --force`
-4. backend の公開 URL で `/api/facility` が返ることを確かめる
-5. worker・scheduler を作ってデプロイする
-6. frontend を作り、`BUILD_API_URL` に backend の公開 URL を入れてデプロイする
-7. backend の `FRONTEND_URL`・`SANCTUM_STATEFUL_DOMAINS` などに frontend の公開 URL を入れて再デプロイする
+2. backend を作り、変数を入れてデプロイする（pre-deploy でマイグレーションと初期データ）
+3. backend の公開 URL で `/api/facility` が返ることを確かめる
+4. worker・scheduler を作ってデプロイする
+5. frontend を作り、`BUILD_API_URL` に backend の公開 URL を入れてデプロイする
+6. backend の `FRONTEND_URL`・`SANCTUM_STATEFUL_DOMAINS` などに frontend の公開 URL を入れて再デプロイする
 
 2回目以降は同時にデプロイされてよい（動いている古い backend が同じ形の `/facility` を返すため）。`/facility` のレスポンスの形を変えるときだけ、backend を先にする。
 
