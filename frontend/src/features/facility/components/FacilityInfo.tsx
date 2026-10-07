@@ -13,12 +13,12 @@ export function FacilityInfo({ facility }: { facility: Facility }) {
     ["定休日", formatWeekdays(facility.regular_holidays)],
     ["利用時間(相談可)", `${rules.min_hours}〜${rules.max_hours}時間`],
     ["レンタル", "ボール・ビブス無料"],
-    ["支払い方法", "現地払い現金のみ"],
+    ["支払い方法", "現地払いのみ"],
   ] as const;
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10">
-      <dl className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-3">
+      <dl className="mx-auto grid w-fit grid-cols-1 gap-x-8 gap-y-6 sm:mx-0 sm:w-auto sm:grid-cols-3">
         {items.map(([label, value]) => (
           <div key={label} className="flex items-start gap-2">
             <span aria-hidden="true" className="mt-1 text-primary">
