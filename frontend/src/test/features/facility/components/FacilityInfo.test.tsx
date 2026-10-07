@@ -17,7 +17,7 @@ test("施設情報の値から、案内の各項目を作る", () => {
   expect(valueOf("定休日")).toBe("月曜日");
   expect(valueOf("利用時間(相談可)")).toBe("2〜4時間");
   expect(valueOf("レンタル")).toBe("ボール・ビブス無料");
-  expect(valueOf("支払い方法")).toBe("現地払い現金のみ");
+  expect(valueOf("支払い方法")).toBe("現地払いのみ");
 });
 
 test("料金・定休日・ルールが変われば、表示も変わる", () => {
