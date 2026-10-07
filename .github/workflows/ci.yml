@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: futsal_test
+          POSTGRES_USER: futsal
+          POSTGRES_PASSWORD: futsal
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U futsal -d futsal_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    # .env の値より、ここで渡した値が優先される（サービスコンテナには localhost で届く）
+    env:
+      DB_HOST: 127.0.0.1
+      DB_USERNAME: futsal
+      DB_PASSWORD: futsal
+      REDIS_HOST: 127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_pgsql, redis
+          coverage: none
+
+      - uses: ramsey/composer-install@v3
+        with:
+          working-directory: backend
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Pint
+        run: vendor/bin/pint --test
+
+      - name: Larastan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Pest
+        run: php artisan test --compact
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+        shell: bash
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run format:check
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Jest
+        run: npm test
+
+      # 施設情報は静的シェルに入るので、ビルドの中で /api/facility を取る。CI にはバックエンドが無いのでスタブで返す
+      - name: Build
+        env:
+          API_URL: http://127.0.0.1:4010/api
+          BUILD_API_URL: http://127.0.0.1:4010/api
+          FRONTEND_URL: http://localhost:3000
+          REVALIDATE_SECRET: ci-secret
+        run: |
+          node scripts/build-stub-server.mjs &
+          for _ in $(seq 1 20); do
+            curl -sf http://127.0.0.1:4010/api/facility > /dev/null && break
+            sleep 0.5
+          done
+          npm run build | tee build.log
+
+      # 静的シェルの部分でうっかり cookies() などを読むと、トップ全体がアクセスごとの描画（ƒ）になる
+      - name: Check that / is Partial Prerender
+        run: |
+          if ! grep -E "^[┌├└] ◐ /( |$)" build.log; then
+            echo "::error::/ is not Partial Prerender (◐)"
+            exit 1
+          fi
