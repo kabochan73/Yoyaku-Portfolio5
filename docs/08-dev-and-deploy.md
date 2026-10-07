@@ -111,7 +111,9 @@ frontend のビルド ──https──▶ backend の公開 URL /api/facility
 ### backend のイメージ
 
 - 本番ステージで `composer install --no-dev --optimize-autoloader` を流し、コードをイメージに入れる
-- 起動時に `php artisan config:cache`・`route:cache`・`event:cache` を流す
+- 起動時に `php artisan optimize`（config・route・view・event のキャッシュ）を流す。serversideup の AUTORUN（`AUTORUN_ENABLED=true`）を使い、AUTORUN のマイグレーションと `storage:link` は止める
+- `APP_LOCALE`・`DB_CONNECTION` などは、渡し忘れても動くよう `config/` の既定値をこのアプリの値（`ja`・`pgsql`）にしておく
+- ヘルスチェックは Laravel 標準の `/up`
 - マイグレーションは backend サービスの pre-deploy command で流す: `php artisan migrate --force`。worker・scheduler では流さない
 - シーダーなど一度きりの作業は、Railway のワンオフコマンドで流す
 - `btree_gist` 拡張はマイグレーションで有効にする
