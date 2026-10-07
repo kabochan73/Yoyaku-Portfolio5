@@ -149,7 +149,7 @@ backend（worker・scheduler も同じ値を参照する）:
 | `APP_URL` | backend の公開 URL |
 | `FRONTEND_URL` | frontend の公開 URL（メールの中のリンク） |
 | `SANCTUM_STATEFUL_DOMAINS` | frontend のホスト |
-| `TRUSTED_PROXIES` | 内部ネットワークの範囲 |
+| `TRUSTED_PROXIES` | 入れなくてよい（既定値が内部ネットワークと Railway の入口の範囲 `100.64.0.0/10` を含む） |
 | `FRONTEND_INTERNAL_URL` | `http://frontend.railway.internal:3000` |
 | `FRONTEND_REVALIDATE_SECRET` | frontend の `REVALIDATE_SECRET` と同じ値 |
 | `DB_URL` | postgres への参照変数 |

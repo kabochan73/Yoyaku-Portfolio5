@@ -19,9 +19,12 @@ export async function serverFetch(
     outgoing.set("Cookie", cookie);
   }
 
-  const forwardedFor = requestHeaders.get("x-forwarded-for");
-  if (forwardedFor !== null) {
-    outgoing.set("X-Forwarded-For", forwardedFor);
+  // 利用者の IP を backend に伝える。Railway では X-Real-IP に入る（backend は X-Real-IP を優先する）
+  for (const name of ["X-Forwarded-For", "X-Real-IP"]) {
+    const value = requestHeaders.get(name);
+    if (value !== null) {
+      outgoing.set(name, value);
+    }
   }
 
   return fetch(`${env.API_URL}${path}`, {

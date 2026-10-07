@@ -14,7 +14,10 @@ let received: Request | undefined;
 
 beforeEach(() => {
   incomingCookie = "laravel_session=abc; XSRF-TOKEN=xyz";
-  incomingHeaders = new Headers({ "x-forwarded-for": "203.0.113.9" });
+  incomingHeaders = new Headers({
+    "x-forwarded-for": "203.0.113.9, 152.233.33.165",
+    "x-real-ip": "203.0.113.9",
+  });
   received = undefined;
   server.use(
     http.get("http://api.test/api/user", ({ request }) => {
@@ -31,7 +34,10 @@ test("API_URL の下のパスに、Cookie・利用者の IP・Referer を付け�
   expect(received?.headers.get("Cookie")).toBe(
     "laravel_session=abc; XSRF-TOKEN=xyz",
   );
-  expect(received?.headers.get("X-Forwarded-For")).toBe("203.0.113.9");
+  expect(received?.headers.get("X-Forwarded-For")).toBe(
+    "203.0.113.9, 152.233.33.165",
+  );
+  expect(received?.headers.get("X-Real-IP")).toBe("203.0.113.9");
   expect(received?.headers.get("Referer")).toBe("http://frontend.test");
   expect(received?.headers.get("Accept")).toBe("application/json");
 });
@@ -44,4 +50,5 @@ test("Cookie と利用者の IP が無ければ付けない", async () => {
 
   expect(received?.headers.get("Cookie")).toBeNull();
   expect(received?.headers.get("X-Forwarded-For")).toBeNull();
+  expect(received?.headers.get("X-Real-IP")).toBeNull();
 });

@@ -128,7 +128,7 @@ export const api = axios.create({
 
 ### `lib/server-fetch.ts`（サーバー用）
 
-- 届いた `Cookie` と `X-Forwarded-For` を引き継ぎ、`Referer` に `FRONTEND_URL` を付けて `API_URL` を呼ぶ。Sanctum は `Referer` が `SANCTUM_STATEFUL_DOMAINS` に含まれるときだけ Cookie のセッションを見る
+- 届いた `Cookie`・`X-Forwarded-For`・`X-Real-IP` を引き継ぎ、`Referer` に `FRONTEND_URL` を付けて `API_URL` を呼ぶ。Sanctum は `Referer` が `SANCTUM_STATEFUL_DOMAINS` に含まれるときだけ Cookie のセッションを見る
 - `import "server-only"` を付ける
 
 ### `features/*/logic/api.ts`

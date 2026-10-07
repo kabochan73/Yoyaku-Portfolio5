@@ -56,7 +56,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'trusted_proxies' => env('TRUSTED_PROXIES', '127.0.0.1,10.0.0.0/8,172.16.0.0/12,fd00::/8'),
+    'trusted_proxies' => env('TRUSTED_PROXIES', '127.0.0.1,10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,fd00::/8'),
 
     'debug_ip_endpoint' => (bool) env('DEBUG_IP_ENDPOINT', false),
 

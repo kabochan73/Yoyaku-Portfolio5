@@ -371,6 +371,7 @@ Route::get('/calendar', ...)->middleware('cache.headers:private;no_cache;etag');
 リクエストは「ブラウザ → Next.js → nginx → Laravel」と中継されるので、そのままでは `$request->ip()` が Next.js サーバーの IP になり、全員が1つの枠を分け合ってしまう。
 
 - Laravel の `TrustProxies` で、内部ネットワーク（Docker / Railway のプライベートネットワーク）からの `X-Forwarded-For` だけを信用する
-- Next.js の rewrites は、届いた `X-Forwarded-For` をそのまま中継する（自分では付け足さない）。本番では Railway の入口が利用者の IP を付ける
-- Next.js のサーバー側からバックエンドを呼ぶとき（カレンダーの SSR など）は、届いた `X-Forwarded-For` を引き継いで送る
+- 本番では Railway の入口が、利用者の IP を `X-Real-IP` に入れる。`X-Forwarded-For` の後ろには入口自身の IP（範囲は非公開）も足されるので、信頼するプロキシから来たときは `X-Real-IP` を優先する（`UseRealIpHeader` ミドルウェア）。`X-Real-IP` が無いとき（ローカル）は `X-Forwarded-For` を使う
+- Next.js の rewrites は、届いたヘッダーをそのまま中継する
+- Next.js のサーバー側からバックエンドを呼ぶとき（カレンダーの SSR など）は、届いた `X-Forwarded-For` と `X-Real-IP` を引き継いで送る
 - デプロイ後の確認用に `GET /debug/ip`（`$request->ip()` を返す）を用意する。ローカル・テスト環境か、環境変数 `DEBUG_IP_ENDPOINT=true` のときだけ有効で、それ以外は 404
